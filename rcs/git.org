@@ -1,0 +1,38 @@
+#+TITLE: Git
+
+* Using multiple GitHub accounts with ssh keys
+
+** OpenSSH config
+
+#+begin_src
+  # Default github account: foo
+  Host github.com
+     HostName github.com
+     IdentityFile ~/.ssh/foo_private_key
+     IdentitiesOnly yes
+
+  # Other github account: bar
+  Host github-bar
+     HostName github.com
+     IdentityFile ~/.ssh/bar_private_key
+     IdentitiesOnly yes
+#+end_src
+
+** Git config
+
++ for account foo
+
+#+begin_src
+  [remote "origin"]
+      url = git@github.com:foo/repo.git
+#+end_src
+
++ for account bar
+
+#+begin_src
+  [remote "origin"]
+      url = git@github-bar:bar/repo.git
+  [user]
+      name = bar
+      email = bar@mail.com
+#+end_src

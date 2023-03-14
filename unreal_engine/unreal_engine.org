@@ -1,0 +1,5438 @@
+#+TITLE: Unreal Engine
+#+AUTHOR: viayulo
+#+EMAIL: vvvhope45@gmail.com
+#+LANGUAGE: en
+#+STARTUP: overview inlineimages
+#+OPTIONS: num:3 p:t
+#+SETUPFILE: ../theme-readtheorg.setup
+#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>
+#+HTML_HEAD: <style> #content{max-width:1800px;}</style>
+#+HTML_HEAD: <style> p{max-width:800px;}</style>
+#+HTML_HEAD: <style> li{max-width:800px;}</style>
+
+* *Engine Setup*
+
+** Editor Preferences
+
+*** General
+
++ Appearance - User Interface - Asset Editor Open Location :: Last Docked Window or New Window
+
++ Keyboard Shortcuts
+
+  - Play World (PIE/SIE) - Stop simulation :: =Shift= + =Escape=
+
++ Loading & Saving - Load Level at Startup :: Last Opened
+
++ Performance - Editor Performance :: Check "Show Frame Rate and Memory"
+
+*** Level Editor
+
++ Viewports - Controls - Advanced :: Check "Use distance-scaled camera speed"
+
+*** Privacy
+
++ Bug Reports :: Don't Send
+
++ Usage Data :: Don't Send
+
+** IDE
+
+*** Visual Studio Setup
+
+**** Install Workloads
+
++ Desktop development with C++
++ Game development with C++
++ C++ profiling tools
++ C++ AddressSanitizer
+
+**** Configurations
+
+***** Change Solution Configurations Width
+
+Right click on the toolbar -> Customize -> Commands tab -> select Toolbar: Standard -> select Solution Configurations -> Modify Selection -> set the width to 200
+
+***** Show Solution Platforms
+
+Standard Toolbar drop down option -> Add or Remove Buttons
+
+***** Disable Error List Window
+
+Tools -> Options -> Projects and Solutions -> uncheck "Always show Error List if build finishes with errors"
+
+***** Turn off Show Inactive Blocks
+
+Tools -> Options -> Text Editor -> C/C++ -> View -> set "Show Inactive Blocks" to False
+
+***** Disable External Dependencies
+
+Tools -> Options -> Text Editor -> C/C++ -> Advanced -> set "Disable External Dependencies Folders" to True
+
+***** Turn off Edit and Continue
+
+Tools -> Options -> Debugging -> uncheck "Enable Edit and Continue"
+
+***** Turn off Paste Indent and Format
+
+Tools -> Options -> Text Editor -> C/C++ -> Code Style -> Formatting -> When I paste -> Do nothing
+
+***** Disable Sign in Prompt
+
+in =C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\ServiceHub\Hosts\ServiceHub.Host.CLR.x86=
+
+rename =ServiceHub.IdentityHost.exe= to =ServiceHub.IdentityHost_disabled.exe=
+
+and do NOT open =Account Settings...= from within Visual Studio
+
+***** Turn off Visual Studio Source Control if you want
+
+Tools -> Source Control
+
+**** Visual Assist extension (no longer needed for VS 2022 and above)
+
+***** Setup
+
+****** Enable Recommended Shortcuts
+
+Extensions -> VAssistX -> Help -> Keyboard Shortcuts -> Recommended...
+
+****** Enable Unreal Engine Features in Options
+
+****** Turn off IntelliSense
+
+[[https://docs.wholetomato.com/default.asp?W805][Default IntelliSense and UE]]
+
+****** Turn off Parse all files when opening a project
+
+Visual Assist Options -> Performance
+
+****** Enable Code Inspection
+
+***** Shortcuts
+
+| Features              | Shortcuts              |
+|-----------------------+------------------------|
+| Open file             | Alt+Shift+O            |
+| Fine any symbol       | Alt+Shift+S            |
+| List method           | Alt+M                  |
+| Go to implementation  | Alt+G                  |
+| Create implementation | under Alt+Shift+Q menu |
+
+**** UnrealVS extension
+
+better build menu
+
+**** Viasfora extension
+
+rainbow bracket
+
+**** Productivity Power Tools extension
+
+**** CodeMaid extension
+
+cleanup and simplify code
+
+**** ClaudiaIDE extension
+
+custom background
+
+* Material
+
+** World Offset
+
+leafs and grass
+
+** World-Aligned Textures and Normals
+
+- Convert texture sample to texture object
+
+** Strata
+
+* Nanite
+
+** Mass Optimization
+
+prevent overdraw in basic asset
+
++ Generate simplified collision for physics and navigation
+  source code: /AncientGame/Plugin/InstanceLevelCollision
++ One sided
+  block the light leaking using large blocks
++ Check for non-Nanite meshes
+  ShowFlags.NaniteMeshes 0
+
+* Virtual Texture
+
+** not for
+
+UI Element
+VFX Texture
+Opacity masks
+
+** show only things would invalidate the shadow maps
+
+ShowFlag.DrawOnlyVSMInvalidatingGeo 1
+
+* Skeleton
+
+** Skeleton Mesh
+
+** Skeleton Assets
+
+A list of Bone & Hierarchy information
+
+*** Hierarchy & Naming
+
+share animation between same base bone setup, hierarchy and naming convention
+
+and fine to attach thing to hierarchy (without change naming, reordering)
+
+*** Sockets, Notifies, Curve Names, Slot Names
+
+*** Retargeting
+
+** Physics Assets
+
+Ragdoll physics
+constraint
+
+* Cosmetics System
+
+Attach actors to invisible animated skeleton
+- For full mesh
+- For individual attachment
+
+* Hair and Fur System (Groom)
+
+** Requirements
+
+*** Plugin
+
++ Groom
++ Alembic Groom Importer
+
+*** Settings
+
++ Support Compute Skin Cache
+
+** Materials
+
+** Skinning
+
+*** Process
+
++ Binding through asset
++ Influenced by triangles
+  r.HairStrands.DebugMode 12
+  r.HairStrands.MeshProjection.Sim.Deformed.Triangles 1
+
+** Simulation
+
+** Advanced
+
+** LOD System
+
+*** Strands
+
++ Reducing strand density
+
+*** Cards
+
++ Generating cards
++ Skinning
++ Material attributes
+
+*** Mesh
+
+* Animation
+
+** Notifies
+
+** Movement drive Animation VS. Animation drive Movement
+
+** *Animation Blueprint*
+
++ Parent Class :: UAnimInstance
+
+** *Montage and Slot*
+
++ Combine Animations
++ Play Animations Selectively
++ Fire off Events
+
+*** Slot(Animation Blueprint)
+
+Play Montage
+
+** Pose Snapshot
+
+Cache pose then blend in AnimBP
+
+** AnimInstance
+
+*** Multi Threaded Animation Update
+
+** *Control Rig*
+
+A plugin
+
+faster than AnimationBP by using special VM
+
+*** Space and Control
+
+**** Control
+
+in Viewport
+
+**** Space
+
+Define origin point of the Control
+
+*** Forwards Solve (Controls driving Bones)
+
+Solving from control rig to FK
+
+*** Backwards Solve (Bones driving Controls (Rig Inversion))
+
+When you already have bone animation, bake to control rig
+
+*** Setup Event
+
+Before any forward or backward solve logic
+
+*** Rig Sharing
+
+*** Control Rig Component
+
+*** Setup Graph
+
+Run once before frame update start to setup some static value(e.g. hand length)
+
+*** Python API
+
+*** Nodes
+
+**** Basic IK
+
++ Effector
+  Default to origin
++ Primary Axis
+  point to bone alone the chain
++ Secondary Axis
+  point to pole vector
+
+*** Runtime Rigging
+
+**** Parameter and Variable
+
+***** Parameter
+
+taking external data into control rig
+
+only have getters
+
+***** Variable
+
+within control rig
+
+**** Add bones
+
+Not real bone but just Transform Variable with parent-child relationship
+
+*** Bake Animation Assets
+
+*** Driving Gameplay
+
+*** Change Existing Animations
+
+Setup Backwards Solve
+
+*** Debug Tips
+
++ Use Control Rig to watch instances in the level
+  to find Magic Number
++ Visual Debug
++ Draw Line Node
++ Debug ctrls attach to a situation depends on the execution orders to visualize
+
+*** Editor Widgets and Python API
+
+** *Motion Warping*
+
++ Forward Solve
+  Init IK bones(or virtual bones)
+
+*** Distance Matching and Stride Warping
+
+Adjust animation to work with varying player movement speed
+
+*** Orientation Waring
+
+Adjust animation to work with varying player movement angles
+
+*** Turn in Place
+
+Natural looking animations when player rotates in place without moving
+
+Play repositioning animations once the orientation is too great
+
+*** Foot placement
+
+** *Full-Body IK Plugin*
+
+Data driven
+
+** Motion Matching
+
+from UBI
+
+* Vertex Animation
+
+* UI/UX
+
+** UMG
+
+*** Viewmodel (MVVM)
+
+** Common UI
+
+*** Implement
+
+Enable CommonUI plugin
+
+change =Game Viewport Client Class= to =CommonGameViewportClient= in project settings
+
+* VFX
+
+** Prepared
+
+*** FBX
+
+*** Alembic
+
+*** VAT
+
+** Real-Time
+
+*** Niagara
+
+*** PhysX
+
+*** Chaos
+
+* Volumetric Effects
+
+* Ragdoll & Physics Assets
+
++ Animation Pose Snapshot | Live Training | Unreal Engine
++ Physical Animations | Live Training | Unreal Engine
+
+** Custom Constraint Profiles
+
+- Add Profile
+  Window->Physics Asset->Profiles->Constraint Profiles
+- Add Constraints to Profile
+- Set Constraint Profile
+  Skeletal Mesh Component
+
+* Physics
+
+** Physics Body Properties
+
+- Location :: The location in the world of the body
+- Rotation :: The rotation or orientation in the world of the body
+- Linear velocity :: How fast and in what direction the body is moving, or changing location
+- Angular velocity :: How fast the body is rotating, or changing rotation, in each of the roll, pitch and yaw axes
+- Mass :: The density of the body, or the resistance to movement forces applied to the body
+- Center of mass :: The center of mass offset from the physical center of the body
+- Inertia tensor :: The resistance to rotational forces, or torques, applied to the body
+
+You move physics bodies by applying forces to them
+
+They come in two flavors, forces and impulses
+
+The equation for a force is *force = mass * distance + time^2*
+
+Forces are generally applied over time and are useful for things like motors or engines
+
+The equation for an impulse is *impulse = mass * distance + time*
+
+Impulses are generally applied over just a single game frame and are useful for things like explosions
+
+Mass and inertia tensor, act against forces and torques respectively
+
+The more massive an object, the more force you need to move it
+
+The more inertia tensor an object has, the more torque you need to rotate it
+
+You should think of mass as *anti-force*
+
+And inertia tensor as *anti-torque*
+
+** Sub-Stepping
+
+switch to Sub-Stepping for physics to get consistent result, no matter how slow rendering rate might be
+
+physics simulations that are more accurate and stable
+
+Regular =Tick()= function will not be called per sub-step, it called per game frame
+
+* Sequencer
+
+* Cinematics with Sequencer
+
+* Metasounds and Quartz
+
+** Metasounds
+
+** Quarts
+
+combine sound and gameplay
+
+* Post Process
+
+* *Blueprint Communications*
+
+** *Direct Communication*
+
++ When to Use It
+  Basically, you know everything that could ever happen between these two things, you just need to make something happen.
++ 1-to-1 communication
+  use flow control techniques such as Loops to talk to many things
++ Sender need reference to receiver
+
+*** Casting
+
+to verify what you're talking to
+
+** *Blueprint Interface* message calls
+
++ When to Use Them
+  You just want to send a signal to an object; if they know what to do with it, great!
++ 1-to-1 communication
++ Sender need reference to receiver
+  only receivers actually need to implement an interface
+  Receiver can call that functionality on itself
+
+*** Trace
+
+cast ray or volume
+
+*** asset in Content Browser
+
+**** Create them in the Content Browser
+
+(right click > Blueprints submenu > Blueprint Interface)
+
+**** In the Blueprint Interface Editor, you automatically get your first function.
+
++ You can setup inputs/outputs if you like.
++ You can't set up any functionality (no other nodes)
+  In fact, the graph is grayed out and locked!
++ eg. Event graph on Sender
+#+ATTR_HTML: width="1000px"
+#+ATTR_ORG: :width 1000
+[[./images/blueprint_interface_sender.png]]
+
+**** Implement the Interface
+
++ In the receiving class, go under Class Settings.
++ Under Implemented Interfaces, add your new Interface.
++ _Recompile_
++ You can now create an event in your graph named the same thing as your function!
++ Now when this class receives the message for that Interface function, something happens!
+
+*** send Interface Messages
+
++ sender don't even care if receiver knows the signal
++ fail silently unless implement the interface onto receiver
+
+*** Interfaces can be used for communication between *sub-levels*
+
++ only work on sub-level is (always) streamed in
+#+ATTR_HTML: width="600px"
+#+ATTR_ORG: :width 600
+[[./images/blueprint_interface_level_comm.png]]
+
+** *Event Dispatchers*
+
++ Receiver need reference to Sender
++ no return value
+
+*** They're a lot like *Twitter*
+
++ You set up an Event Dispatcher on the *sender*
+  This is like _setting up a Twitter account_
++ Any number of Receivers can *Bind* to this Event Dispatcher
+  This is like the _Receiver(s) following_ the Sender's Twitter feed
+  NOTE: Receiver will need some initial reference to the Sender to make the Bind!
++ The Sender Calls the Event Dispatcher
+  This is like _making a Tweet_, which is just sent out into the ether
+  There may be no one following the Sender, so maybe no one gets the Tweet
++ The Receivers who had an Event Bound to that Event Dispatcher can then react accordingly
+  _Followers saw_ the Tweet and do something in response
+
+*** Make sure unbind on Destroyed
+
+#+ATTR_HTML: width="400px"
+#+ATTR_ORG: :width 400
+[[./images/event_dispatchers_unbind_on_destroyed.png]]
+
+*** C++ equivalent
+
++ setup the Event Dispatcher in the sender
+  Declare Delegate (UPROPERTY(BlueprintAssignable))
++ Bind receiver's own Custom Event to that Dispatcher
+  Bind Event to the delegate
++ Signatures are a specific combination of inputs on a Dispatcher
+  Declare delegate macro, create a matching event in receiver
++ Call the Event Dispatcher
+  Delegate.Broadcast()
+
+* *Gameplay Framework*
+
+Gameplay Framework facilitates the organization of logic and interaction between different entities of your game.
+
++ No weapon System
++ No concept of health or death
+
+Object->Actor+Component->Level->World->WorldContext->GameInstance->Engine
+
+** UObject
+
++ GC
++ Metadata
++ Reflection
++ Serialization
++ Editable
++ Class Default Object
+
+** Actor & Component
+
++ Actor
+
+  An entity in a level
+
+  Usually contains ActorComponents
+
+  + Dose *not* have a location/rotation!
+    Has a RootComponent pointer instead
+  + Create them using SpawnActor
+    Not NewObject/ConstructObject in C++
+  + Will not be Garbage Collected during gameplay
+
++ ActorComponent
+  Re-usable functionality that can be added to an Actor
+
+*** =AActor= : UObject
+
++ Replication
++ Spawn
++ Tick
+
+#+begin_src cpp
+  TArray<AActor*> Children;
+  void Tick(float DeltaSeconds);
+
+  AActor* Owner;//(weak)
+  TSet<UActorComponent*> OwnedComponents;// All components of the Actor
+  TArray<UActorComponent*> InstanceComponents;// store components of the Actor instance
+#+end_src
+
+*** =UActorComponent= : UObject
+
++ For abstract behavior
++ No visual presence no location
+
+#+begin_src cpp
+  void ReceiveTick(float DeltaSeconds);
+
+  AActor* OwnerPrivate;
+  UWorld* WorldPrivate;
+#+end_src
+
+*** =USceneComponent= : UActorComponent
+
++ Have transform
++ Can attach
++ Do not require visual presentation
+
+#+begin_src cpp
+  USceneComponent* AttachParent;
+  TArray<USceneComponent*> AttachChildren;
+  FTransform ComponentToWorld;
+  FBoxSphereBounds Bounds;
+#+end_src
+
+*** =UPrimitiveComponent= : USceneComponent
+
++ with visual presentation
+
+#+begin_src cpp
+  FLightingChannels LightingChannels;
+  FBodyInstance BodyInstance;
+#+end_src
+
+*** =UMeshComponent= : UPrimitiveComponent
+
+#+begin_src cpp
+  TArray<class UMaterialInterface*>
+#+end_src
+
+*** =UStaticMeshComponent= : UMeshComponent
+
+#+begin_src cpp
+  UStaticMesh* StaticMesh;
+  TArray<struct FStaticMeshComponentLODInfo> LODData;
+#+end_src
+
+*** =UChildActorComponent= : USceneComponent
+
+**** Child Actor Template(since UE 4.14)
+
+Modify ChildActor via blueprint or Details panel
+
+** Level & World
+
+*** =ULevel= : UObject
+
+#+begin_src cpp
+  TArray<AActor*> Actors;
+  ALevelScriptActor* LevelScriptActor;
+  TArray<UModelComponent*> ModelComponents;
+
+  AWorldSettings* WorldSettings;//(Actors[0])
+#+end_src
+
+*** =ALevelScriptActor= : AActor
+
+#+begin_src cpp
+  uint32 bInputEnabled = 1;
+#+end_src
+
+*** =AInfo= : AActor
+
+#+begin_src cpp
+  UBillboardComponent* SpriteComponent;
+#+end_src
+
+*** =AWorldSettings= : AInfo
+
+#+begin_src cpp
+  TSubclassOf<class AGameMode> DefaultGameMode;
+#+end_src
+
+*** =UWorld= : UObject
+
+#+begin_src cpp
+  TArray<ULevel*> Levels;
+  AGameMode* AuthorityGameMode;
+  AGameMode* GameState;
+  UWorldComposition* WorldComposition;
+  FPhysScene* PhysicsScene;
+
+  ULevel* PersistentLevel;
+  ULevel* CurrentLevel;
+  TArray<ULevelStreaming*> StreamingLevels;
+  UGameInstance* OwningGameInstance;
+  TArray<TAutoWeakObjectPtr<AController>> ControllerList;
+  TArray<TAutoWeakObjectPtr<APlayerController>> PlayerControllerList;
+  TArray<TAutoWeakObjectPtr<APawn>> PawnList;
+#+end_src
+
+#+begin_src cpp
+  namespace EWorldType
+  {
+    enum Type
+    {
+      None,     // An untyped world, in most cases this will be the vestigial worlds of streamed in sub-levels
+      Game,     // The game world
+      Editor,   // A world being edited in the editor
+      PIE,      // A Play In Editor world
+      Preview,  // A preview world for an editor tool
+      Inactive  // An editor world that was loaded but not currently being edited in the level editor
+    };
+  }
+#+end_src
+
+*** =FWorldContext=
+
+store context of switching between Worlds or Levels
+
+For standalone, there is only one FWorldContext
+
+#+begin_src cpp
+  UGameInstance* OwningGameInstance;
+  UWorld* ThisCurrentWorld;
+  UGameViewportClient* GameViewport;
+ #+end_src
+
+*** =UGameInstance= : UObject
+
+#+begin_src cpp
+  FWorldContext* WorldContext;
+  TArray<ULocalPlayer*> LocalPlayers;
+  UOnlineSession* OnlineSession;
+#+end_src
+
+*** =UEngine= : UObject
+
++ GEngine :: Global pointer to UEngine instance
+
+#+begin_src cpp
+  TIndirectArray<FWorldContext> WorldList;
+#+end_src
+
+**** =UGameEngine= : UEngine
+
+there is only one World, hence UGameEngine just store a pointer to GameInstance for convenience.
+
+#+begin_src cpp
+  UGameInstance* GameInstance;
+#+end_src
+
+**** =UEditorEngine= : UEngine
+
+EditorWorld does not owning GameInstance
+
+GameInstance store in PlayWorld->OwningGameInstance
+
+#+begin_src cpp
+  UWorld* PlayWorld;
+  UWorld* EditorWorld;
+  TArray<FEditorViewportClient*> AllViewportClients;
+#+end_src
+
+*** =UGameplayStatics= : UBlueprintFunctionLibrary
+
+GetPlayerController, SpawActor, Openlevel
+
+** Pawns & Controller
+
++ Relationship
+  A *Pawn* is an Actor that can be an "agent" within the world.
+  *Pawns* can be _possessed_ by a *Controller*.
+  The *Pawn* is the _physical representation_ of that agent in the game.
+  The *Controller* possesses the *Pawn* and can set rules for its _behavior_.
+
+A *Controller* can either be a *PlayerController* taking input from a human player or an *AIController* with automated control by the computer.
+
++ Pawn
+
+  No movement or input code by default
+
+  Usually handles movement input
+
++ Controller
+
+  Only one Pawn at a time
+
+  + A Controller that represents a local human player
+    - *Not* an AI or remote client over network
+  + Contains some useful options
+    - Whether to show mouse cursor
+    - Options for touch/click events
+  + Good place to put things not associated with the agent
+    - In-game menu
+    - Voice chat
+
+  + Control Rotation
+
+    + have a "Control Rotation"
+    + Pawns has flags to match Control Rotation
+      - E.g. "Use Control Rotation Pitch"
+    + CameraComponent and SpringArmComponent have similar
+    + Quick to iterate on different camera modes
+
+*** Pawn
+
+**** =APawn= : AActor
+
+An Actor can be *Controlled
+
+#+begin_src cpp
+  TSubclassOf<AController> AIControllerClass;
+  uint32 bInputEnabled=1;
+  FVector ControlInputVector;
+#+end_src
+
+**** =ADefaultPawn= : APawn
+
+A Pawn with _Pawn Movement Component_, _Sphere Collision Component_, _Static Mesh Component_
+
+#+begin_src cpp
+  USphereComponent* CollisionComponent;
+  UPawnMovementComponent* MovementComponent;
+#+end_src
+
+***** =ASpectatorPawn= : ADefaultPawn
+
+A Default Pawn with _Spectator Pawn Movement_, turn off Static Mesh, Set _collision channel_ to "Spectator"
+
+**** =ACharacter= : APawn
+
+A Pawn with _Character Movement Component_, _Capsule Collision Component_, _Skeleton Mesh Component_
+
++ Special *Pawn* that contains walking logic
++ Comes with several components
+  - CapsuleComponent for collision
+  - CharacterMovementComponent for movement logic
+  - SkeletalMeshComponent for Visuals
+  - ArrowComponent to indicate forwards (+X)
++ Automatically support networking
+  - Including client side perdiction etc.
+  - Improved form UE3
+
+#+begin_src cpp
+  USkeletonMeshComponent* Mesh;
+  UCharacterMovementComponent* CharacterMovement;
+  UCapsuleComponent* CapsuleComponent;
+#+end_src
+
+*** Controller
+
+**** =AController= : AActor
+
+#+begin_src cpp
+  void Possess(APawn* InPawn);
+  void UnPossess();
+  void ChangeState(FName NewState);
+  void InitPlayerState();
+
+  APlayerState* PlayerState;
+  uint32 bAttachToPawn=1;
+  FRotator ControlRotation;
+  FName StateName;
+  TWeakObjectPtr<class AActor> StartSpot;
+  APawn* Pawn;
+  ACharacter* Character;
+  USceneComponent* TransformComponent;
+#+end_src
+
+**** =APlayerState= : AInfo
+
+**** =APlayerController= : AController
+
+#+begin_src cpp
+  void SetPlayer(UPlayer* InPlayer);
+
+  UPlayer* Player;
+  AHUD* MyHUD;
+  APlayerCameraManager* PlayerCameraManager;
+  UPlayerInput* PlayerInput;
+  APawn* AcknowledgedPawn;
+  ASpectatorPawn* SpectatorPawn;
+#+end_src
+
+**** =AAIController= : AController
+
+#+begin_src cpp
+  MoveToActor(AActor* Goal,...);
+  MoveToLocation(const FVector& Dest,...);
+  bool RunBehavior(UBehaviorTree* BTAsset);
+  UseBlackboard(UBlackboardData* BlackboardAsset, UBlackboardComponent* BlackboardComponent)
+  ClaimTaskResource(TSubclassOf<UGameplayTaskResource> ResourceClass);
+
+  UBrainComponent* BrainComponent;
+  UAIPerceptionComponent* PerceptionComponent;
+  UBlackboardComponent* Blackboard;
+#+end_src
+
+** GameMode
+
++ Only exists on the server in multiplayer games
+  - For information clients need to know, make a GameState
++ Can access from anywhere (GetGameMode)
+
+*** =AGameModeBase= : AInfo
+
+#+begin_src cpp
+  void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
+  void InitGameState();
+  bool SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate);
+  void ProcessServerTravel(const FString& URL, bool bAbsolute = false);
+  APlayerController* ProcessClientTravel(FString& URL,...);
+  APlayerController* Login(class UPlayer* NewPlayer,...);
+  void PostLogin(APlayerController* NewPlayer);
+
+  TSubclassOf<class APlayerController> PlayerControllerClass;
+  TSubclassOf<class ASpectatorPawn> SpectatorPawnClass;
+  TSubclassOf<class APlayerController> ReplaySpectatorPlayerControllerClass;
+  TSubclassOf<class APlayerState> PlayerStateClass;
+  TSubclassOf<class AGameStateBase> GameStateClass;
+  AGameSession* GameSession;
+  AGameStateBase* GameState;
+  uint32 bUseSeamlessTrabel:1;
+  uint32 bPauseable:1;
+  uint32 bStartPlayersAsSpectators:1;
+#+end_src
+
+**** =AGameMode= : AGameModeBase
+
+Default multi-player implement
+
+#+begin_src cpp
+  void SetMatchState(FName NewState);
+
+  FName MatchState;
+  TSubclassOf<class ULocalMessage> EngineMessageClass;
+  int32 NumSpectators;
+  int32 NumPlayers;
+  int32 NumBots;
+#+end_src
+
+*** =AGameStateBase= : AInfo
+
+#+begin_src cpp
+  void AddPlayerState(class APlayerState* PlayerState);
+
+  TSubclassOf<AGameModeBase> GameModeClass;
+  AGameModeBase* AuthorityGameMode;
+  TSubclassOf<ASpectatorPawn> SpectatorClass;
+  TArray<class APlayerState*> PlayerArray;
+#+end_src
+
+**** =AGameState= : AGameStateBase
+
+#+begin_src cpp
+  void SetMatchState(FName NewState);
+
+  FName MatchState;
+  FName PreviousMatchState;
+#+end_src
+
+*** =AGameSession= : AInfo
+
+** Player
+
+*** =UPlayer= : UObject
+
+#+begin_src cpp
+  void SwitchController(APlayerController* PC);
+
+  APlayerController* PlayerController;
+  int32 CurrentNetSpeed;
+#+end_src
+
+*** =ULocalPlayer= : UPlayer
+
+#+begin_src cpp
+  UWorld* GetWorld();
+  UGameInstance* GetGameInstance() const;
+  bool SpawnPlayActor(const FString& URL, FString& OutError, UWorld* InWorld);
+  bool IsPrimaryPlayer() const;
+
+  TSharedPtr<const FUniqueNetId> CachedUniqueNetId;
+  UGameViewportClient* ViewportClient;
+  FVector2D Origin;
+  FVector2D Size;
+  FVector LastViewLocation;
+  TSubclassOf<class APlayerController> PendingLevelPlayerControllerClass;
+  int32 ControllerId;
+#+end_src
+
+*** =UNetConnection= : UPlayer
+
+** GameInstance
+
+*** =UGameInstance=
+
+** Subsystems
+
++ automatically instantiate
++ life cycle manager
+
+*** =USubsystem= : UObject
+
+*** =UGameInstanceSubsystem= : USubsystem
+
+*** =UWorldSubsystem= : USubsystem
+
+*** =ULocalPlayerSubsystem= : USubsystem
+
+*** =UDynamicSubsystem= : USubsystem
+
+*** =UEditorSubsystem= : UDynamicSubsystem
+
+**** Build.cs
+
+#+begin_src c
+  if (Target.bBuildEditor)
+  {
+      PublicDependencyModuleNames.AddRange(new string[] { "EditorSubsystem" });
+  }
+#+end_src
+
+*** =UEngineSubsystem= : UDynamicSubsystem
+
+*** E.g.
+
+**** Definition
+
+#+begin_src cpp
+  UCLASS()
+  class HELLO_API UMyScoreSubsystem: public UGameInstanceSubsystem
+  {
+      GENERATED_BODY()
+  public:
+      virtual bool ShouldCreateSubsystem(UObject* Outer) const override { return true; }
+      virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+      virtual void Deinitialize() override;
+  public:
+      UFUNCTION(BlueprintCallable)
+      void AddScore(float delta);
+  public:
+      UPROPERTY(EditAnywhere, BlueprintReadWrite)
+      float Score;
+  }
+#+end_src
+
+**** Access subsystem
+
++ EngineSubsystem
+  #+begin_src cpp
+    UMyEngineSubsystem* MySubSystem = GEngine->GetEngineSubsystem<UMyEngineSubsystem>();
+  #+end_src
+
++ EditorSubsystem
+  #+begin_src cpp
+    UMyEditorSubsystem* MySubSystem = GEditor->GetEditorSubsystem<UMyEditorSubsystem>();
+  #+end_src
+
++ GameInstanceSubsystem
+  #+begin_src cpp
+    UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(...);
+    UMyGameInstanceSubsystem* MySubsystem = GameInstance->GetSubsystem<UMyGameInstanceSubsystem>();
+  #+end_src
+
++ WorldSubsystem
+  #+begin_src cpp
+    UWorld* World = MyActor->GetWorld();// Or any other way to get world
+    UMyWorldSubsystem* MySubsystem = World->GetSubsystem<UMyWorldSubsystem>();
+  #+end_src
+
++ LocalPlayerSubsystem
+  #+begin_src cpp
+    ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(PlayerController->Player);
+    UMyLocalPlayerSubsystem* MySubsystem = LocalPlayer->GetSubsystem<UMyLocalPlayerSubsystem>();
+  #+end_src
+
+*** =FSubsystemCollectionBase= : FGCObject
+
+**** =FSubsystemCollection= : FSubsystemCollectionBase
+
+** Camera
+
+*** =FTViewTarget=
+
+A ViewTarget is the primary actor the camera is associated with.
+
+Responsible for providing the PlayerCameraManager with an ideal _Point of View_ (POV).
+
+#+begin_src cpp
+public:
+
+    /** Target Actor used to compute POV */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=TViewTarget)
+    TObjectPtr<class AActor> Target;
+
+    /** Computed point of view */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=TViewTarget)
+    struct FMinimalViewInfo POV;
+
+protected:
+    /** PlayerState (used to follow same player through pawn transitions, etc., when spectating) */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=TViewTarget)
+    TObjectPtr<class APlayerState> PlayerState;
+#+end_src
+
+*** =APlayerCameraManager= : AActor
+
+Calculate point of view, apply camera modifiers.
+
+*** =UCameraComponent= : USceneComponent
+
+Represents a camera viewpoint and settings, such as POV, FOV, projection type, and post-process overrides.
+=GetCameraView()=
+
+*** =ACameraActor= : AActor
+
+An Actor with CameraComponent that can be placed in a level.
+
+*** Camera Responsibility Chain
+
+#+ATTR_HTML: width="900px"
+#+ATTR_ORG: :width 900
+[[./images/camera_responsibility_chain.png]]
+
+*** Point of View update sequence
+
+=APlayerController::UpdateCameraManager()= called after all actors have been ticked, =APlayerCameraManager::UpdateCamera(float DeltaTime)= performs per-tick camera update.
+
+=APlayerCameraManager::FillCameraCache(const FMinimalViewInfo& NewInfo)= called in =APlayerCameraManager::DoUpdateCamera(float DeltaTime)= to caches given final POV info for efficient access from other game code.
+
+=APlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime)= calculates an updated POV for the given ViewTarget, apply camera modifiers at the end (view shakes for example), synchronize the actor (=SetActorLocationAndRotation(OutVT.POV.Location, OutVT.POV.Rotation, false);=) with the view target results.
+
+*** Two approach to setup camera
+
+**** Add CameraComponent to target actor
+
+**** Use ViewTarget and offset to calculate POV (in PlayerCameraManager)
+
+Override =APlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime)=
+
+** ModularGameplay (Plugin)
+
+*** =UGameFrameworkComponent= : UActorComponent
+
+*** =UControllerComponent= : UGameFrameworkComponent
+
+*** =UGameStateComponent= : UGameFrameworkComponent
+
+*** =UPawnComponent= : UGameFrameworkComponent
+
+*** =UPlayerStateComponent= : UGameFrameworkComponent
+
+* Some Modules
+
+** HUD
+
++ Responsible for drawing in-game UI
+  - E.g. Health bar, Ammo counter
++ Simple "immediate mode" API
+  - E.g. DrawText, DrawTexture
++ Some simple support for hit boxes
++ No tools for building this UI
+
+** Input
+
++ Passed in the following order
+  - PlayerController
+  - Level Blueprint
+  - Possessed Pawn
+
+** Collision
+
++ Line traces (aka raycasts)
++ Geometry sweeps
++ Overlap test
++ In C++ functions are found in UWorld
+
+*** Complex Collision
+
++ The actual graphics triangles
++ Used for weapons, visibility etc.
+
+*** Simple Collision
+
++ Set of Box/sphere/capsule/convex
++ Several ways to author (import with mesh, tool on StaticMesh Editor)
++ Used for player movement, physics simulation etc.
+
+*** There is option to "use complex as simple"
+
+E.g. cave interiors
+
+* =UObject=
+* *AI*
+
+*** "body-soul-brain" pattern
+
++ "body" is the visual representation of the character
++ "soul" being the entity that control it at that moment
++ "brain" what defines its behavior
++ "memory" where it stores the information it needs to behave
+#+ATTR_HTML: width="900px"
+#+ATTR_ORG: :width 900
+[[./images/pawns_and_controller_relationship.png]]
+
+*** Behavior Trees
+
+describe switching between a finite set of tasks
+
+**** Execution Flow
+
+#+ATTR_HTML: width="500px"
+#+ATTR_ORG: :width 500
+[[./images/behavior_tree_execution_flow.png]]
+
+**** Composites
+
+Define the *root* of a branch and the base rules for how that branch is *executed*
++ Sequence
+  Execute *every child* in order, until one of them fails
++ Selector
+  Find and execute the *first child* that does not fail
+
+**** Decorators (Conditionals)
+
+Define *whether or not* a branch in the tree, or even a single node, *can be executed*
+
+**** Services
+
+Will *execute at their defined frequency* as long as their branch is being executed
+
+**** Tasks
+
+*Node that "do" things*, like move to, or adjust Blackboard values
+They can have Decorators or Services attached to them
+
+*** Blackboard
+
+*** Perception System
+
+Provides a way for Pawns to receive data from the environment, such as *noises*, *damaged* by something or *see* something.
+
+accomplished with the *AI Perception Component* gathers registered *Stimuli Sources(component)*.
+
++ Debug view
+  '(apostrophe) 4(num)
+
+** Navigation
+
+NavMesh
+
+* MASS AI
+
+** SmartObject
+
+Interaction
+
+*** Setup
+
++ Enable Plugin
+  SmartObject
+  GameplayBehaviorSmartObject
+  AI Behaviors
+
+** State Tree
+
+** Zone Graph
+
+* Environment Query System (EQS)
+
+* *HID*
+
+** Enhanced Input
+
+*** Setup
+
++ Enable Plugin
+  ProjectSettings->Engine - Input->Default Classes->Default Player Input Class->EnhancedPlayerInput
+  ProjectSettings->Engine - Input->Default Classes->Default Input Component Class->EnhancedInputComponent
+
+*** Implement
+
+**** Build.cs
+
+PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+
+**** .h
+
+#+begin_src cpp
+#include "InputActionValue.h"
+
+// Forward declaration
+class UInputAction;
+class UInputMappingContext;
+#+end_src
+
+#+begin_src cpp
+protected:
+    virtual void PawnClientRestart() override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Controls|Input Action")
+    UInputAction* YourAction;
+
+    /** Input mapping to add to the input system */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Controls|Input Mapping")
+    UInputMappingContext* BaseInputMappingContext = nullptr;
+
+    /** Priority to bind mapping context with */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Controls|Input Mapping")
+    int BaseInputPriority = 0;
+#+end_src
+
+**** .cpp
+
++ Header
+#+begin_src cpp
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#+end_src
++ Subsystem
+#+begin_src cpp
+void AShooterCharacter::PawnClientRestart()
+{
+    Super::PawnClientRestart();
+
+    // Make sure that we have a valid PlayerController.
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        // Get the Enhanced Input Local Player Subsystem from the Local Player related to our Player Controller.
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+        {
+            // PawnClientRestart can run more than once in an Actor's lifetime, so start by clearing out any leftover mappings.
+            Subsystem->ClearAllMappings();
+
+            // Add each mapping context, along with their priority values. Higher values outprioritize lower values.
+            Subsystem->AddMappingContext(BaseInputMappingContext, BaseInputPriority);
+        }
+    }
+}
+#+end_src
++ Handler function
+#+begin_src cpp
+void AMyPawn::MyFirstAction(const FInputActionValue& Value)
+{
+    // Debug log output to confirm that the handler function is running.
+    UE_LOG(LogTemp, Warning, TEXT("%s called with Input Action Value %s (magnitude %f)"), TEXT(__FUNCTION__), *Value.ToString(), Value.GetMagnitude());
+    // Use the GetType() function to determine Value's type, and the [] operator with an index between 0 and 2 to access its data.
+}
+#+end_src
++ Setup Input Component to bind function to *Input Action*
+#+begin_src cpp
+void AYourGameCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+{
+    // Make sure that we are using a UEnhancedInputComponent; if not, the project is not configured correctly.
+    if (UEnhancedInputComponent* PlayerEnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        // There are ways to bind a UInputAction* to a handler function and multiple types of ETriggerEvent that may be of interest.
+
+        // This calls the handler function on the tick when MyInputAction starts, such as when pressing an action button.
+        if (MyInputAction)
+        {
+            PlayerEnhancedInputComponent->BindAction(MyInputAction, ETriggerEvent::Started, this, &AMyPawn::MyInputHandlerFunction);
+        }
+
+        // This calls the handler function (a UFUNCTION) by name on every tick while the input conditions are met, such as when holding a movement key down.
+        if (MyOtherInputAction)
+        {
+            PlayerEnhancedInputComponent->BindAction(MyOtherInputAction, ETriggerEvent::Triggered, this, TEXT("MyOtherInputHandlerFunction"));
+        }
+    }
+}
+#+end_src
+
+*** Debug
+
+showdebug EnhancedInput
+
+*** Input Trigger
+
+#+ATTR_HTML: width="600px"
+#+ATTR_ORG: :width 600
+[[./images/enhanced_input_trigger.png]]
+
+**** Trigger State
+
++ None
++ Ongoing
++ Triggered
+
+**** Trigger Event
+
+#+begin_src cpp
+  enum class ETriggerEvent : uint8
+  {
+    // No significant trigger state changes occurred and there are no active device inputs
+    None = 0                UMETA(Hidden),
+
+    // Triggering occurred after one or more processing ticks
+    Triggered,              // ETriggerState (None -> Triggered, Ongoing -> Triggered, Triggered -> Triggered)
+
+    // An event has occurred that has begun Trigger evaluation. Note: Triggered may also occur this frame.
+    Started,                // ETriggerState (None -> Ongoing, None -> Triggered)
+
+    // Triggering is still being processed
+    Ongoing,                // ETriggerState (Ongoing -> Ongoing)
+
+    // Triggering has been canceled
+    Canceled,               // ETriggerState (Ongoing -> None)
+
+    // The trigger state has transitioned from Triggered to None this frame, i.e. Triggering has finished.
+    // NOTE: Using this event restricts you to one set of triggers for Started/Completed events. You may prefer two actions, each with its own trigger rules.
+    // TODO: Completed will not fire if any trigger reports Ongoing on the same frame, but both should fire. e.g. Tick 2 of Hold (= Ongoing) + Pressed (= None) combo will raise Ongoing event only.
+    Completed,              // ETriggerState (Triggered -> None)
+  };
+#+end_src
+
+**** Triggers
+
++ Donw :: Trigger fires when the input exceeds the actuation threshold.
+  Note: When no triggers are bound Down (with an actuation threshold of > 0) is the default behavior.
+
++ Pressed :: Trigger fires once only when input exceeds the actuation threshold.
+  Holding the input will not cause further triggers.
+
++ Released :: Trigger returns Ongoing whilst input exceeds the actuation threshold.
+  Trigger fires once only when input drops back below actuation threshold.
+
++ Hold :: Trigger fires once input has remained actuated for HoldTimeThreshold seconds.
+  Trigger may optionally fire once, or repeatedly fire.
+
++ HoldAndRelease :: Trigger fires when input is released after having been actuated for at least HoldTimeThreshold seconds.
+
++ Tap :: Input must be actuated then released within TapReleaseTimeThreshold seconds to trigger.
+
++ Chorded :: Applies a chord action that must be triggering for this trigger's action to trigger
+
+** Support for =DUALSHOCK®4= on Windows via RawInput plugin
+
++ Enable "Windows RawInput" plugin
+
++ Add DualShock4 config to =DefaultInput.ini=
+
+  #+begin_src ini
+    [/Script/RawInput.RawInputSettings]
+    +DeviceConfigurations=(VendorID="0x054C",ProductID="0x05C4",AxisProperties=((Key=Gamepad_RightY,bInverted=True,bGamepadStick=True),(Key=Gamepad_RightX,bGamepadStick=True),(Key=Gamepad_LeftY,bInverted=True,bGamepadStick=True),(Key=Gamepad_LeftX,bGamepadStick=True),(Key=Gamepad_Special_Left_X,Offset=-1.142857),(bEnabled=False,Key=GenericUSBController_Axis6),(Key=Gamepad_RightTriggerAxis),(Key=Gamepad_LeftTriggerAxis)),ButtonProperties=((Key=Gamepad_FaceButton_Left),(Key=Gamepad_FaceButton_Bottom),(Key=Gamepad_FaceButton_Right),(Key=Gamepad_FaceButton_Top),(Key=Gamepad_LeftShoulder),(Key=Gamepad_RightShoulder),(Key=Gamepad_LeftTrigger),(Key=Gamepad_RightTrigger),(Key=Gamepad_Special_Left),(Key=Gamepad_Special_Right),(Key=Gamepad_LeftThumbstick),(Key=Gamepad_RightThumbstick),(Key=GenericUSBController_Button13),(Key=GenericUSBController_Button14),(bEnabled=False,Key=GenericUSBController_Button15),(bEnabled=False,Key=GenericUSBController_Button16),(bEnabled=False,Key=GenericUSBController_Button17),(bEnabled=False,Key=GenericUSBController_Button18),(bEnabled=False,Key=GenericUSBController_Button19),(bEnabled=False,Key=GenericUSBController_Button20)))
+    +DeviceConfigurations=(VendorID="0x054C",ProductID="0x09CC",AxisProperties=((Key=Gamepad_RightY,bInverted=True,bGamepadStick=True),(Key=Gamepad_RightX,bGamepadStick=True),(Key=Gamepad_LeftY,bInverted=True,bGamepadStick=True),(Key=Gamepad_LeftX,bGamepadStick=True),(Key=Gamepad_Special_Left_X,Offset=-1.142857),(bEnabled=False,Key=GenericUSBController_Axis6),(Key=Gamepad_RightTriggerAxis),(Key=Gamepad_LeftTriggerAxis)),ButtonProperties=((Key=Gamepad_FaceButton_Left),(Key=Gamepad_FaceButton_Bottom),(Key=Gamepad_FaceButton_Right),(Key=Gamepad_FaceButton_Top),(Key=Gamepad_LeftShoulder),(Key=Gamepad_RightShoulder),(Key=Gamepad_LeftTrigger),(Key=Gamepad_RightTrigger),(Key=Gamepad_Special_Left),(Key=Gamepad_Special_Right),(Key=Gamepad_LeftThumbstick),(Key=Gamepad_RightThumbstick),(Key=GenericUSBController_Button13),(Key=GenericUSBController_Button14),(bEnabled=False,Key=GenericUSBController_Button15),(bEnabled=False,Key=GenericUSBController_Button16),(bEnabled=False,Key=GenericUSBController_Button17),(bEnabled=False,Key=GenericUSBController_Button18),(bEnabled=False,Key=GenericUSBController_Button19),(bEnabled=False,Key=GenericUSBController_Button20)))
+    +DeviceConfigurations=(VendorID="0x054C",ProductID="0x0CE6",AxisProperties=((Key=Gamepad_RightTriggerAxis),(Key=Gamepad_LeftTriggerAxis),(Key=Gamepad_RightY,bInverted=True,bGamepadStick=True),(Key=Gamepad_RightX,bGamepadStick=True),(Key=Gamepad_LeftY,bInverted=True,bGamepadStick=True),(Key=Gamepad_LeftX,bGamepadStick=True),(bEnabled=False,Key=GenericUSBController_Axis7),(Key=Gamepad_Special_Left_X,Offset=-1.142857)),ButtonProperties=((Key=Gamepad_FaceButton_Left),(Key=Gamepad_FaceButton_Bottom),(Key=Gamepad_FaceButton_Right),(Key=Gamepad_FaceButton_Top),(Key=Gamepad_LeftShoulder),(Key=Gamepad_RightShoulder),(Key=Gamepad_LeftTrigger),(Key=Gamepad_RightTrigger),(Key=Gamepad_Special_Left),(Key=Gamepad_Special_Right),(Key=Gamepad_LeftThumbstick),(Key=Gamepad_RightThumbstick),(Key=GenericUSBController_Button13),(Key=GenericUSBController_Button14),(bEnabled=False,Key=GenericUSBController_Button15),(bEnabled=False,Key=GenericUSBController_Button16),(bEnabled=False,Key=GenericUSBController_Button17),(bEnabled=False,Key=GenericUSBController_Button18),(bEnabled=False,Key=GenericUSBController_Button19),(bEnabled=False,Key=GenericUSBController_Button20)))
+    bRegisterDefaultDevice=True
+  #+end_src
+
+  + D-pad is recognized as axis, so use blueprint macro for the D-pad input
+
+    #+ATTR_HTML: width="400px"
+    #+ATTR_ORG: :width 400
+    [[./images/dualshock4_rawinput_dpad.png]]
+
+    #+ATTR_HTML: width="700px"
+    #+ATTR_ORG: :width 700
+    [[./images/dualshock4_rawinput_dpad_macro.png]]
+
+    Copy this to Blueprint
+
+    #+begin_src ue_Blueprint
+      BPGraph(GraphName="Gamepad D-pad",GraphType=GT_Macro,OriginalBlueprint=LevelScriptBlueprint'"/Game/ThirdPerson/Maps/ThirdPersonMap.ThirdPersonMap:PersistentLevel.ThirdPersonMap"',NodesString="Begin Object Class=/Script/BlueprintGraph.K2Node_Tunnel Name=\"K2Node_Tunnel_0\"\r\n   bCanHaveOutputs=True\r\n   MetaData=(Category=NSLOCTEXT(\"KismetSchema\", \"Default\", \"Default\"))\r\n   NodePosY=112\r\n   NodeGuid=F48B47494769A5D1A726538BB63C2E80\r\n   CustomProperties Pin (PinId=2DD0B5004D798448EAB01AAD607044F6,PinName=\"Execute\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_SwitchInteger_0 DF04DDB14E8C4334D1CD36B1310824A6,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=6103CBDA4F74F199895072B7DA5E07F9,PinName=\"AxisValue\",Direction=\"EGPD_Output\",PinType.PinCategory=\"real\",PinType.PinSubCategory=\"double\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_PromotableOperator_0 7366A3F340215CB28DD96B8AA387713A,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties UserDefinedPin (PinName=\"Execute\",PinType=(PinCategory=\"exec\"),DesiredPinDirection=EGPD_Output)\r\n   CustomProperties UserDefinedPin (PinName=\"AxisValue\",PinType=(PinCategory=\"real\",PinSubCategory=\"double\"),DesiredPinDirection=EGPD_Output)\r\nEnd Object\r\nBegin Object Class=/Script/BlueprintGraph.K2Node_Tunnel Name=\"K2Node_Tunnel_2\"\r\n   bCanHaveInputs=True\r\n   NodePosX=799\r\n   NodeGuid=77C3EB09449A32CB37DE31B9F16A1FB5\r\n   CustomProperties Pin (PinId=F6E31BC84CCBC4D216FF2E84509C83C5,PinName=\"Up\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 0FBA77E94450094E726A5EB9E8A524A9,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=AF7E530D4A1B1316E9AAA7A927A9DE50,PinName=\"Down\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 88789EAA4B8339346E21838D2C78EAAB,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=775F79E34EB422430FA40AA732B9E273,PinName=\"Right\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 029FFFED4FCC512E34C9A48A22DAF54D,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=46F4B0AF4A07E923C50CE7B503FA01F9,PinName=\"Left\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 60CB643B455BD680ED213DAD42991D02,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties UserDefinedPin (PinName=\"Up\",PinType=(PinCategory=\"exec\"),DesiredPinDirection=EGPD_Input)\r\n   CustomProperties UserDefinedPin (PinName=\"Down\",PinType=(PinCategory=\"exec\"),DesiredPinDirection=EGPD_Input)\r\n   CustomProperties UserDefinedPin (PinName=\"Right\",PinType=(PinCategory=\"exec\"),DesiredPinDirection=EGPD_Input)\r\n   CustomProperties UserDefinedPin (PinName=\"Left\",PinType=(PinCategory=\"exec\"),DesiredPinDirection=EGPD_Input)\r\nEnd Object\r\nBegin Object Class=/Script/BlueprintGraph.K2Node_SwitchInteger Name=\"K2Node_SwitchInteger_0\"\r\n   bHasDefaultPin=False\r\n   NodePosX=202\r\n   NodePosY=112\r\n   NodeGuid=BBC1BF7147DB082DFF3ACA9F53F3A0AA\r\n   CustomProperties Pin (PinId=DF04DDB14E8C4334D1CD36B1310824A6,PinName=\"execute\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_Tunnel_0 2DD0B5004D798448EAB01AAD607044F6,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=7A7BD8F44872CE2300F160B55277BF14,PinName=\"Selection\",PinType.PinCategory=\"int\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,DefaultValue=\"0\",AutogeneratedDefaultValue=\"0\",LinkedTo=(K2Node_CallFunction_2 8E9129624E678943A201B282A69D1928,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=491F434345CDE8E0333D26A0040F305C,PinName=\"NotEqual_IntInt\",PinType.PinCategory=\"object\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=Class\'\"/Script/Engine.KismetMathLibrary\"\',PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,DefaultObject=\"/Script/Engine.Default__KismetMathLibrary\",PersistentGuid=00000000000000000000000000000000,bHidden=True,bNotConnectable=True,bDefaultValueIsReadOnly=True,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=6EFD834E4FC43B927D6DEBAB072E65B1,PinName=\"0\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 3B47E6EF4A69304711D9359407E47588,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=FBF66ECC49B465CC899EC08FC306D4F3,PinName=\"1\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=B32868E64630ECD3107AB5B201403FB4,PinName=\"2\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 38369A5A4296BC7E3F1D799ECAC6310A,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=47479CD040B31818887880BAB06EAE46,PinName=\"3\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=159A306E47AC2F0593704DA523C57C22,PinName=\"4\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 D6F9D32E4E5C5DB91BBD088046840387,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=188E1A2845609DC1E1878D9CACDF3676,PinName=\"5\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=2E4FF5ED4909B48567B7F6B7B76D82A0,PinName=\"6\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 253FDB584E5CD589905B619F5C6F55D6,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=518712034FCCB974DE762D93D8C11BEC,PinName=\"7\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=2227949D462C6F215B5EED86C80E12DC,PinName=\"8\",Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_DoOnceMultiInput_1 AC9759824DD5DD6D350D8F99CCEAC77C,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\nEnd Object\r\nBegin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name=\"K2Node_CallFunction_2\"\r\n   bIsPureFunc=True\r\n   FunctionReference=(MemberParent=Class\'\"/Script/Engine.KismetMathLibrary\"\',MemberName=\"Round\")\r\n   NodePosX=202\r\n   NodePosY=450\r\n   NodeGuid=B00B63494C6E6A256821AA9D229F5EAF\r\n   CustomProperties Pin (PinId=72D15923470ACE62B53823B40C759335,PinName=\"self\",PinFriendlyName=NSLOCTEXT(\"K2Node\", \"Target\", \"Target\"),PinToolTip=\"Target\\nKismet Math Library オブジェクト参照\",PinType.PinCategory=\"object\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=Class\'\"/Script/Engine.KismetMathLibrary\"\',PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,DefaultObject=\"/Script/Engine.Default__KismetMathLibrary\",PersistentGuid=00000000000000000000000000000000,bHidden=True,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=5CD6D3BE452CDFFF21A83DA3602DABE1,PinName=\"A\",PinToolTip=\"A\\n浮動小数点数 (倍精度)\",PinType.PinCategory=\"real\",PinType.PinSubCategory=\"double\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,DefaultValue=\"0.0\",AutogeneratedDefaultValue=\"0.0\",LinkedTo=(K2Node_PromotableOperator_0 024C932241D8E1B730973C98386CA2D4,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=8E9129624E678943A201B282A69D1928,PinName=\"ReturnValue\",PinToolTip=\"Return Value\\nInteger\\n\\nAを最も近い整数に丸めます(例:-1.6は-2、1.6は2になります)\",Direction=\"EGPD_Output\",PinType.PinCategory=\"int\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,DefaultValue=\"0\",AutogeneratedDefaultValue=\"0\",LinkedTo=(K2Node_SwitchInteger_0 7A7BD8F44872CE2300F160B55277BF14,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\nEnd Object\r\nBegin Object Class=/Script/BlueprintGraph.K2Node_DoOnceMultiInput Name=\"K2Node_DoOnceMultiInput_1\"\r\n   NumAdditionalInputs=3\r\n   NodePosX=505\r\n   NodePosY=84\r\n   NodeGuid=7B5FBC73424485576BC2A4BA85FA1944\r\n   CustomProperties Pin (PinId=38369A5A4296BC7E3F1D799ECAC6310A,PinName=\"A In\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"344CD8654AF3F78F729EA9B94B32C6C7\", \"A\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiIn\", \"In\")),PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_SwitchInteger_0 B32868E64630ECD3107AB5B201403FB4,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=60CB643B455BD680ED213DAD42991D02,PinName=\"A Out\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"F13FDF8B40068F5C3BFEE09B84387524\", \"A\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiOut\", \"Out\")),Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_Tunnel_2 46F4B0AF4A07E923C50CE7B503FA01F9,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=3B47E6EF4A69304711D9359407E47588,PinName=\"Reset In\",PinFriendlyName=NSLOCTEXT(\"K2Node\", \"DoOnceResetIn\", \"Reset In\"),PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_SwitchInteger_0 6EFD834E4FC43B927D6DEBAB072E65B1,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=180766C646D222CD0DCEE58BB7B6CCFF,PinName=\"Reset Out\",PinFriendlyName=NSLOCTEXT(\"K2Node\", \"DoOnceResetOut\", \"Reset Out\"),Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=D6F9D32E4E5C5DB91BBD088046840387,PinName=\"B In\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"4A43493B4C880155C1C49D9922D5E437\", \"B\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiIn\", \"In\")),PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_SwitchInteger_0 159A306E47AC2F0593704DA523C57C22,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=88789EAA4B8339346E21838D2C78EAAB,PinName=\"B Out\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"47BBA00942DB7131583CE1B8F1A21BE6\", \"B\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiOut\", \"Out\")),Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_Tunnel_2 AF7E530D4A1B1316E9AAA7A927A9DE50,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=253FDB584E5CD589905B619F5C6F55D6,PinName=\"C In\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"E2D7F25A402F5424258B72832C963E57\", \"C\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiIn\", \"In\")),PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_SwitchInteger_0 2E4FF5ED4909B48567B7F6B7B76D82A0,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=029FFFED4FCC512E34C9A48A22DAF54D,PinName=\"C Out\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"A48AFBB04BA2BD4FFED5F18BE25BB627\", \"C\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiOut\", \"Out\")),Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_Tunnel_2 775F79E34EB422430FA40AA732B9E273,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=AC9759824DD5DD6D350D8F99CCEAC77C,PinName=\"D In\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"CCFA60AC44365DF640B2458B72FC45DF\", \"D\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiIn\", \"In\")),PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_SwitchInteger_0 2227949D462C6F215B5EED86C80E12DC,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=0FBA77E94450094E726A5EB9E8A524A9,PinName=\"D Out\",PinFriendlyName=LOCGEN_FORMAT_NAMED(NSLOCTEXT(\"K2Node\", \"DoOnceMultiInputPinName\", \"{Identifier} {Direction}\"), \"Identifier\", NSLOCTEXT(\"\", \"EE51249140FDE58F422AFCA6695478C9\", \"D\"), \"Direction\", NSLOCTEXT(\"K2Node\", \"DoOnceMultiOut\", \"Out\")),Direction=\"EGPD_Output\",PinType.PinCategory=\"exec\",PinType.PinSubCategory=\"\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_Tunnel_2 F6E31BC84CCBC4D216FF2E84509C83C5,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\nEnd Object\r\nBegin Object Class=/Script/BlueprintGraph.K2Node_PromotableOperator Name=\"K2Node_PromotableOperator_0\"\r\n   bIsPureFunc=True\r\n   FunctionReference=(MemberParent=Class\'\"/Script/Engine.KismetMathLibrary\"\',MemberName=\"Multiply_DoubleDouble\")\r\n   NodePosX=202\r\n   NodePosY=532\r\n   NodeGuid=A365305443A3ECE662ECA3A1B37942FC\r\n   CustomProperties Pin (PinId=7366A3F340215CB28DD96B8AA387713A,PinName=\"A\",PinToolTip=\"A\\n浮動小数点数 (倍精度)\",PinType.PinCategory=\"real\",PinType.PinSubCategory=\"double\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_Tunnel_0 6103CBDA4F74F199895072B7DA5E07F9,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=EA135C5A4707FF78016F29A499E60613,PinName=\"B\",PinToolTip=\"B\\n浮動小数点数 (倍精度)\",PinType.PinCategory=\"real\",PinType.PinSubCategory=\"double\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,DefaultValue=\"-7.000000\",PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\n   CustomProperties Pin (PinId=024C932241D8E1B730973C98386CA2D4,PinName=\"ReturnValue\",PinToolTip=\"Return Value\\n浮動小数点数 (倍精度)\\n\\n乗算 (A * B)\",Direction=\"EGPD_Output\",PinType.PinCategory=\"real\",PinType.PinSubCategory=\"double\",PinType.PinSubCategoryObject=None,PinType.PinSubCategoryMemberReference=(),PinType.PinValueType=(),PinType.ContainerType=None,PinType.bIsReference=False,PinType.bIsConst=False,PinType.bIsWeakPointer=False,PinType.bIsUObjectWrapper=False,PinType.bSerializeAsSinglePrecisionFloat=False,LinkedTo=(K2Node_CallFunction_2 5CD6D3BE452CDFFF21A83DA3602DABE1,),PersistentGuid=00000000000000000000000000000000,bHidden=False,bNotConnectable=False,bDefaultValueIsReadOnly=False,bDefaultValueIsIgnored=False,bAdvancedView=False,bOrphanedPin=False,)\r\nEnd Object\r\n")
+
+    #+end_src
+
+* GameplayTags
+
+** Native Gameplay Tags
+
+[[https://www.thegames.dev/?p=106][Native Gameplay Tags (New in 4.27 and UE5)]]
+
++ .h
+  #+begin_src cpp
+    #include "CoreMinimal.h"
+    #include "NativeGameplayTags.h"
+
+    //if you want to export the tag
+    MYMODULE_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(MYTAG)
+  #+end_src
+
++ .cpp
+
+  #+begin_src cpp
+    UE_DEFINE_GAMEPLAY_TAG(MYTAG, "MyTag")
+  #+end_src
+
+** Adding and using Gameplay Tags in C++
+
+[[https://www.thegames.dev/?p=78][Adding and using Gameplay Tags in C++]]
+
+* *Gameplay Abilities System (GAS)*
+
+A highly flexible framework for building the types of abilities and attributes that you might find in an RPG or MOBA title.
+
+** Benefits and Pitfalls
+
+** Features
+
++ Skills
+  Consumption
+  Cooldown
++ Handle attribute (HP、MP、Attack、Defend)
++ Apply state effect (Knockup、on fire、stun)
++ Apply GameplayTags
++ Generate VFX and SFX
++ Network replication, prediction
++ damage type
++ player battle state
+
+** Applicable Project
+
++ C++ Project
++ Multiplayer game using Dedicated Server
++ Plenty complex skill logic
+
+** Ability System Component(ASC) =UAbilitySystemComponent= : =UGameplayTasksComponent=
+
+Core
+
+Recommended using =PlayerState= as OwnerActor
+
+*** GameplayAbility(GA) =UGameplayAbility=
+
+Ability, logic
+
+NOT for basic movement, ray trace, UI
+
+Call from Class Default Object(CDO) or use Instance to store value
+
+**** =FGameplayAbilitySpec=
+
+#+begin_src cpp
+  UGameplayAbility* Ability;
+  int32 Level;
+  FGameplayAbilityActivationInfo ActivationInfo;
+#+end_src
+
+Level will pass to GameplayEffect
+
+*** GameplayEffect(GE) =UGameplayEffect=
+
+Apply ability effect
+
+(Pure config Blueprint)
+(Only use GE to modify Attribute)
+
+Data "Template" for FGameplayEffectSpec
+
++ FGameplayModifierInfo
++ FGameplayEffectCue
+
+**** =FGameplayEffectSpec=
+
+#+begin_src cpp
+  const UGameplayEffect* Def;
+  float Level;
+#+end_src
+
+"Instance" after every time UGameplayAbility =Apply= UGameplayEffect
+
+Can change value depend on Level
+
+**** =FActiveGameplayEffect=
+
+*** GameplayCue(GC) =UGameplayCueNotify=
+
+FX
+
+**** Trigger
+
++ UGameplayAbility -> Execute/Add
++ UGameplayEffect
++ Global Tag-Handler Map
+  GameplayCueEditor
+
+**** Static Cue =UGameplayCueNotify_Static=
+
+Trigger once
+Class Default Object(CDO)
+
+**** Actor Cue =AGameplayCueNotify_Actor=
+
+Continuous
+Spawn
+
+*** GameplayAttribute =FGameplayAttribute=
+
+Attribute
+(Only use GE to modify Attribute)
+
+#+begin_src cpp
+  FString AttributeName;
+  UStruct* AttributeOwner;
+  TFieldPath<FProperty> Attribute;
+#+end_src
+
+**** =FGameplayAttributeData=
+
+#+begin_src cpp
+  float BaseValue;
+  float CurrentValue;
+#+end_src
+
++ BaseValue
++ CurrentValue
+  for temporary value change like buff
+  can return to Basevalue after GE end
+
+**** =UAttributeSet=
+
+*** GameplayTag =FGameplayTag=
+
+Tag system
+X.Y.Z FName
+
+#+begin_src cpp
+  FName TagName;
+#+end_src
+
+**** =FGameplayTagContainer=
+
+#+begin_src cpp
+  TArray<FGameplayTag> GameplayTags;
+#+end_src
+
+**** =FGameplayTagQuery=
+
+#+begin_src cpp
+  TArray<FGameplayTag> TagDictionary;
+#+end_src
+
+**** =FGameplayTagNode=
+
+#+begin_src cpp
+  FName TagName;
+  FGameplayTagNode* ParentNode;
+  TArray<FGameplayTagNode*> ChildTags;
+#+end_src
+
+**** =UGameplayTagsManager=
+
+store tree
+
+#+begin_src cpp
+  TSharedPtr<FGameplayTagNode> GameplayRootTag;
+#+end_src
+
+*** GameplayTask =UGameplayTask=
+
+Async task
+(can run without GAS)
+
+**** =UGameplayTasksComponent=
+
+**** =UAbilityTask:UGameplayTask=
+
+#+begin_src cpp
+  UGameplayAbility* Ability;
+#+end_src
+
+*** Event =FGameplayEventData=
+
+register callbacks to ASC, call when =Send=
+Map with Tag
+payload data
+
+** Gameplay Effect
+
+*** UIData
+
+** Implement
+
+*** OwnerActor & AvatarActor
+
+PlayerState (OwnerActor)
+Pawn (AvatarActor)
+
+*** GameplayTags
+
+Project Settings -> GameplayTags
+
+*** GameplayAbility
+
+behavior, ability
+Eg. Can or cannot be knockup, knockdown，use specific item
+
+*** GameplayEffect
+
++ Blueprint
++ Configurable data table (in Details panel)，not to add logic
++ Damage evaluate
++ Add buff (Change GameplayTags)
+
+*** AttributeSet
+
++ Define attributes
++ Manage attribute changes
++ Network Replicate
+
+**** Character
+
+Need be added as variable to Actor，and register to ASC
+
++ AGASSampleCharacter.h
+  #+begin_src cpp
+  public:
+      UPROPERTY()
+      USampleAttributeSet* AttributeSet;
+  #+end_src
+
++ AGASSampleCharacter.cpp
+  #+begin_src cpp
+  AGASSampleCharacter::AGASSampleCharacter()
+  {
+      // Instantiate ASC
+      AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+
+      // AttributeSet created in OwnerActor constructer will automatically register to ASC
+      AttributeSet = CreateDefaultSubobject<USampleAttributeSet>(TEXT("AttributeSet"));
+  }
+  #+end_src
+
+**** AttributeSet
+
++ SampleAttributeSet.h
+  #+begin_src cpp
+  #pragma once
+
+  #include "CoreMinimal.h"
+  #include "AttributeSet.h"
+  #include "AbilitySystemComponent.h"
+  #include "Net/UnrealNetwork.h"
+  #include "GameplayEffectExtension.h"
+  #include "SampleAttributeSet.generated.h"
+
+  // Define macro that add getter and setter functions
+  #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
+      GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
+      GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
+      GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
+      GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+  UCLASS()
+  class GASSAMPLE_API USampleAttributeSet : public UAttributeSet
+  {
+      GENERATED_BODY()
+  public:
+      USampleAttributeSet();
+
+      virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+  public:
+      UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_Health)
+      FGameplayAttributeData Health;
+      ATTRIBUTE_ACCESSORS(USampleAttributeSet, Health);
+      UFUNCTION()
+      void OnRep_Health(const FGameplayAttributeData& OldValue);
+
+      UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_MaxHealth)
+      FGameplayAttributeData MaxHealth;
+      ATTRIBUTE_ACCESSORS(USampleAttributeSet, MaxHealth);
+      UFUNCTION()
+      void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
+
+      UPROPERTY(BlueprintReadOnly, Category = "Physical", ReplicatedUsing = OnRep_Physical)
+      FGameplayAttributeData Physical;
+      ATTRIBUTE_ACCESSORS(USampleAttributeSet, Physical);
+      UFUNCTION()
+      void OnRep_Physical(const FGameplayAttributeData& OldValue);
+
+      UPROPERTY(BlueprintReadOnly, Category = "Physical", ReplicatedUsing = OnRep_MaxPhysical)
+      FGameplayAttributeData MaxPhysical;
+      ATTRIBUTE_ACCESSORS(USampleAttributeSet, MaxPhysical);
+      UFUNCTION()
+      void OnRep_MaxPhysical(const FGameplayAttributeData& OldValue);
+
+  public:
+      // Callback before attribute change
+      virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue);
+
+      // Callback after GE execute
+      virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+  }
+  #+end_src
+
+** Workflow
+
+*** Enable Plugin
+
+Enable "Gameplay Abilities" "GameplayTagsEditor"
+
+*** Register Plugin
+
++ Build.cs
+  #+begin_src cpp
+  PublicDependencyModuleNames.AddRange(new string[] { "core", "CoreUObject", "Engine",
+      "GameplayAbilities",// Register plugin
+      "GameplayTags", "GameplayTasks"// To customize Task
+  });
+  #+end_src
+
++ Character.h
+#+begin_src cpp
+  #pragma once
+
+  #include "CoreMinimal.h"
+  #include "GameFramework/Character.h"
+
+  // Add header files
+  #include "AbilitySystemInterface.h"
+  #include "AbilitySystemComponent.h"
+  #include "SampleAttributeSet.h"
+
+  #include "GASSampleCharacter.generated.h"
+
+  UCLASS(config=Game)
+  class AGASSampleCharacter : public ACharacter,
+      public IAbilitySystemInterface // Inherit AbilitySystem Interface
+  {
+      GENERATED_BODY()
+
+  public:
+      // Declare ASC
+      UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameplayAbilities, meta = (AllowPrivateAccess = "true"))
+      class UAbilitySystemComponent* AbilitySystem;
+
+      // Implement interface method
+      virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+      // Declare an Ability array
+      UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Abilities)
+      TArray<TSubclassOf<UGameplayAbility>> MyAbilities;
+
+      UPROPERTY()
+      USampleAttributeSet* AttributeSet;
+
+  }
+#+end_src
+
++ Character.cpp
+#+begin_src cpp
+  UAbilitySystemComponent* AGASSampleCharacter::GetAbilitySystemComponent() const
+  {
+      return AbilitySystem;
+  }
+
+  AGASSampleCharacter::AGASSampleCharacter()
+  {
+
+      // Instantiate ASC
+      AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+
+      // AttributeSet created in OwnerActor constructer will automatically register to ASC
+      AttributeSet = CreateDefaultSubobject<USampleAttributeSet>(TEXT("AttributeSet"));
+  }
+
+  AGASSampleCharacter::BeginPlay()
+  {
+      Super::BeginPlay();
+
+      if (AbilitySystem != nullptr)
+      {
+          // Grant Abilities to ASC
+          if (HasAuthority() && MyAbilities.Num() > 0)
+          {
+              for (auto i = 0; i < MyAbilities.Num(); i++)
+              {
+                  if (MyAbilities[i] == nullptr)
+                  {
+                      continue;
+                  }
+                  AbilitySystem->GiveAbility(FGameplayAbilitySpec(MyAbilities[i].GetDefaultObject(), 1, 0));
+              }
+          }
+
+          // Initialize ASC
+          AbilitySystem->InitAbilityActorInfo(this, this);
+      }
+  }
+#+end_src
+
+** Ability Set
+
+** Ability Tag Relationship Mapping
+
+#+BEGIN_QUOTE
+Gameplay Tag Relationships
+
+Kaos Spectrum
+
+When dealing with a lot of abilities, the block and cancel tags can get confusing and hard to keep managed. By using a relationship, we can apply block, cancel and activation tags from a more central location. This allows us to define what ability tags block and cancels what abilities.
+#+END_QUOTE
+
+*** AbilityTagRelationshipMapping.h
+
+#+BEGIN_QUOTE
+Lets create a new class, which is going to be a DataAsset, and populate it with the required fields
+#+END_QUOTE
+
+#+begin_src cpp
+  #pragma once
+
+  #include "CoreMinimal.h"
+  #include "GameplayTagContainer.h"
+  #include "Engine/DataAsset.h"
+  #include "AbilityTagRelationshipMapping.generated.h"
+
+  /** Struct that defines the relationship between different ability tags */
+  USTRUCT()
+  struct ABILITYSYSTEMUTILITY_API FAbilityTagRelationship
+  {
+      GENERATED_BODY()
+
+      /** The tag that this container relationship is about. Single tag, but abilities can have multiple of these */
+      UPROPERTY(EditAnywhere, Category = Ability, meta = (Categories = "Gameplay.Action"))
+      FGameplayTag AbilityTag;
+
+      /** The other ability tags that will be blocked by any ability using this tag */
+      UPROPERTY(EditAnywhere, Category = Ability)
+      FGameplayTagContainer AbilityTagsToBlock;
+
+      /** The other ability tags that will be canceled by any ability using this tag */
+      UPROPERTY(EditAnywhere, Category = Ability)
+      FGameplayTagContainer AbilityTagsToCancel;
+
+      /** If an ability has the tag, this is implicitly added to the activation required tags of the ability */
+      UPROPERTY(EditAnywhere, Category = Ability)
+      FGameplayTagContainer ActivationRequiredTags;
+
+      /** If an ability has the tag, this is implicitly added to the activation blocked tags of the ability */
+      UPROPERTY(EditAnywhere, Category = Ability)
+      FGameplayTagContainer ActivationBlockedTags;
+  };
+
+
+  /** Mapping of how ability tags block or cancel other abilities */
+  UCLASS()
+  class ABILITYSYSTEMUTILITY_API UAbilityTagRelationshipMapping : public UDataAsset
+  {
+      GENERATED_BODY()
+
+  private:
+      /** The list of relationships between different gameplay tags (which ones block or cancel others) */
+      UPROPERTY(EditAnywhere, Category = Ability, meta=(TitleProperty="AbilityTag"))
+      TArray<FAbilityTagRelationship> AbilityTagRelationships;
+
+  public:
+      /** Given a set of ability tags, parse the tag relationship and fill out tags to block and cancel */
+      void GetAbilityTagsToBlockAndCancel(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer* OutTagsToBlock, FGameplayTagContainer* OutTagsToCancel) const;
+
+      /** Given a set of ability tags, add additional required and blocking tags */
+      void GetRequiredAndBlockedActivationTags(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer* OutActivationRequired, FGameplayTagContainer* OutActivationBlocked) const;
+
+      /** Returns true if the specified ability tags are canceled by the passed in action tag */
+      bool IsAbilityCancelledByTag(const FGameplayTagContainer& AbilityTags, const FGameplayTag& ActionTag) const;
+  };
+#+end_src
+
+*** AbilityTagRelationshipMapping.cpp
+
+#+begin_src cpp
+  #include "AbilityTagRelationshipMapping.h"
+
+  void UAbilityTagRelationshipMapping::GetAbilityTagsToBlockAndCancel(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer* OutTagsToBlock, FGameplayTagContainer* OutTagsToCancel) const
+  {
+      // Simple iteration for now
+      for (int32 i = 0; i < AbilityTagRelationships.Num(); i++)
+      {
+          const FAbilityTagRelationship& Tags = AbilityTagRelationships[i];
+          if (AbilityTags.HasTag(Tags.AbilityTag))
+          {
+              if (OutTagsToBlock)
+              {
+                  OutTagsToBlock->AppendTags(Tags.AbilityTagsToBlock);
+              }
+              if (OutTagsToCancel)
+              {
+                  OutTagsToCancel->AppendTags(Tags.AbilityTagsToCancel);
+              }
+          }
+      }
+  }
+
+  void UAbilityTagRelationshipMapping::GetRequiredAndBlockedActivationTags(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer* OutActivationRequired, FGameplayTagContainer* OutActivationBlocked) const
+  {
+      // Simple iteration for now
+      for (int32 i = 0; i < AbilityTagRelationships.Num(); i++)
+      {
+          const FAbilityTagRelationship& Tags = AbilityTagRelationships[i];
+          if (AbilityTags.HasTag(Tags.AbilityTag))
+          {
+              if (OutActivationRequired)
+              {
+                  OutActivationRequired->AppendTags(Tags.ActivationRequiredTags);
+              }
+              if (OutActivationBlocked)
+              {
+                  OutActivationBlocked->AppendTags(Tags.ActivationBlockedTags);
+              }
+          }
+      }
+  }
+
+  bool UAbilityTagRelationshipMapping::IsAbilityCancelledByTag(const FGameplayTagContainer& AbilityTags, const FGameplayTag& ActionTag) const
+  {
+      // Simple iteration for now
+      for (int32 i = 0; i < AbilityTagRelationships.Num(); i++)
+      {
+          const FAbilityTagRelationship& Tags = AbilityTagRelationships[i];
+
+          if (Tags.AbilityTag == ActionTag && Tags.AbilityTagsToCancel.HasAny(AbilityTags))
+          {
+              return true;
+          }
+      }
+
+      return false;
+  }
+#+end_src
+
+#+BEGIN_QUOTE
+Now we need to add a couple of things to the Ability System Component so we can make use of these relationships
+#+END_QUOTE
+
+*** MyAbilitySystemComponent.h
+
+#+BEGIN_QUOTE
+Add the following to your custom ASC
+#+END_QUOTE
+
+#+begin_src cpp
+  #pragma region TagRelationship //{
+
+  public:
+
+      // Sets the current tag relationship mapping, if null it will clear it out
+      void SetTagRelationshipMapping(UAbilityTagRelationshipMapping* NewMapping);
+
+      // Looks at ability tags and gathers additional required and blocking tags
+      void GetAdditionalActivationTagRequirements(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer& OutActivationRequired, FGameplayTagContainer& OutActivationBlocked) const;
+
+  protected:
+
+      //~UAbilitySystemComponent interface
+      virtual void ApplyAbilityBlockAndCancelTags(const FGameplayTagContainer& AbilityTags, UGameplayAbility* RequestingAbility, bool bEnableBlockTags, const FGameplayTagContainer& BlockTags, bool bExecuteCancelTags, const FGameplayTagContainer& CancelTags) override;
+      virtual void HandleChangeAbilityCanBeCanceled(const FGameplayTagContainer& AbilityTags, UGameplayAbility* RequestingAbility, bool bCanBeCanceled) override;
+      //~End of UAbilitySystemComponent interface
+
+      // If set, this table is used to look up tag relationships for activate and cancel
+      UPROPERTY(EditDefaultsOnly, Category = "Abilities|GameplayTags")
+      TObjectPtr<class UAbilityTagRelationshipMapping> TagRelationshipMapping;
+
+  #pragma endregion TagRelationship //}
+#+end_src
+
+*** MyAbilitySystemComponent.cpp
+
+#+begin_src cpp
+  #pragma region TagRelationship //{
+
+  void UGFAbilitySystemComponent::SetTagRelationshipMapping(UAbilityTagRelationshipMapping* NewMapping)
+  {
+      TagRelationshipMapping = NewMapping;
+  }
+
+  void UGFAbilitySystemComponent::GetAdditionalActivationTagRequirements(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer& OutActivationRequired, FGameplayTagContainer& OutActivationBlocked) const
+  {
+      if (TagRelationshipMapping)
+      {
+          TagRelationshipMapping->GetRequiredAndBlockedActivationTags(AbilityTags, &OutActivationRequired, &OutActivationBlocked);
+      }
+  }
+
+  void UGFAbilitySystemComponent::ApplyAbilityBlockAndCancelTags(const FGameplayTagContainer& AbilityTags, UGameplayAbility* RequestingAbility, bool bEnableBlockTags, const FGameplayTagContainer& BlockTags, bool bExecuteCancelTags, const FGameplayTagContainer& CancelTags)
+  {
+      FGameplayTagContainer ModifiedBlockTags = BlockTags;
+      FGameplayTagContainer ModifiedCancelTags = CancelTags;
+
+      if (TagRelationshipMapping)
+      {
+          // Use the mapping to expand the ability tags into block and cancel tag
+          TagRelationshipMapping->GetAbilityTagsToBlockAndCancel(AbilityTags, &ModifiedBlockTags, &ModifiedCancelTags);
+      }
+
+      Super::ApplyAbilityBlockAndCancelTags(AbilityTags, RequestingAbility, bEnableBlockTags, ModifiedBlockTags, bExecuteCancelTags, ModifiedCancelTags);
+
+      //@TODO: Apply any special logic like blocking input or movement
+  }
+
+  void UGFAbilitySystemComponent::HandleChangeAbilityCanBeCanceled(const FGameplayTagContainer& AbilityTags, UGameplayAbility* RequestingAbility, bool bCanBeCanceled)
+  {
+      Super::HandleChangeAbilityCanBeCanceled(AbilityTags, RequestingAbility, bCanBeCanceled);
+
+      //@TODO: Apply any special logic like blocking input or movement
+  }
+
+  #pragma endregion TagRelationship //}
+#+end_src
+
+#+BEGIN_QUOTE
+Now the block and cancel tags will work, but we need to do some stuff in your custom Gameplay Ability to handle the Activation Required and Activation Blocked tags.
+#+END_QUOTE
+
+*** MyGameplayAbility.h
+
+#+BEGIN_QUOTE
+Lets override the following function in your custom Gameplay Ability class
+#+END_QUOTE
+
+#+begin_src cpp
+  #pragma region TagRelationship //{
+
+  protected:
+
+      //~UGameplayAbility interface
+      virtual bool DoesAbilitySatisfyTagRequirements(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const override;
+      //~End of UGameplayAbility interface
+
+  #pragma endregion TagRelationship //}
+#+end_src
+
+*** MyGameplayAbility.cpp
+
+#+BEGIN_QUOTE
+and implement the function like this (this is a hard override of the default GameplayAbility function
+#+END_QUOTE
+
+#+begin_src cpp
+  #include "AbilitySystem/MyAbilitySystemComponent.h"
+  #include "GameplayTagContainer.h"
+  #include "AbilitySystemGlobals.h"
+
+  #pragma region TagRelationship //{
+
+  bool UGFGameplayAbility::DoesAbilitySatisfyTagRequirements(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+  {
+      // Specialized version to handle death exclusion and AbilityTags expansion via ASC
+
+      bool bBlocked = false;
+      bool bMissing = false;
+
+      UAbilitySystemGlobals& AbilitySystemGlobals = UAbilitySystemGlobals::Get();
+      const FGameplayTag& BlockedTag = AbilitySystemGlobals.ActivateFailTagsBlockedTag;
+      const FGameplayTag& MissingTag = AbilitySystemGlobals.ActivateFailTagsMissingTag;
+
+      // Check if any of this ability's tags are currently blocked
+      if (AbilitySystemComponent.AreAbilityTagsBlocked(AbilityTags))
+      {
+          bBlocked = true;
+      }
+
+      const UMyAbilitySystemComponent* MyASC = Cast<UMyAbilitySystemComponent>(&AbilitySystemComponent);
+      static FGameplayTagContainer AllRequiredTags;
+      static FGameplayTagContainer AllBlockedTags;
+
+      AllRequiredTags = ActivationRequiredTags;
+      AllBlockedTags = ActivationBlockedTags;
+
+      // Expand our ability tags to add additional required/blocked tags
+      if (MyASC)
+      {
+          MyASC->GetAdditionalActivationTagRequirements(AbilityTags, AllRequiredTags, AllBlockedTags);
+      }
+
+      // Check to see the required/blocked tags for this ability
+      if (AllBlockedTags.Num() || AllRequiredTags.Num())
+      {
+          static FGameplayTagContainer AbilitySystemComponentTags;
+
+          AbilitySystemComponentTags.Reset();
+          AbilitySystemComponent.GetOwnedGameplayTags(AbilitySystemComponentTags);
+
+          if (AbilitySystemComponentTags.HasAny(AllBlockedTags))
+          {
+              bBlocked = true;
+          }
+
+          if (!AbilitySystemComponentTags.HasAll(AllRequiredTags))
+          {
+              bMissing = true;
+          }
+      }
+
+      if (SourceTags != nullptr)
+      {
+          if (SourceBlockedTags.Num() || SourceRequiredTags.Num())
+          {
+              if (SourceTags->HasAny(SourceBlockedTags))
+              {
+                  bBlocked = true;
+              }
+
+              if (!SourceTags->HasAll(SourceRequiredTags))
+              {
+                  bMissing = true;
+              }
+          }
+      }
+
+      if (TargetTags != nullptr)
+      {
+          if (TargetBlockedTags.Num() || TargetRequiredTags.Num())
+          {
+              if (TargetTags->HasAny(TargetBlockedTags))
+              {
+                  bBlocked = true;
+              }
+
+              if (!TargetTags->HasAll(TargetRequiredTags))
+              {
+                  bMissing = true;
+              }
+          }
+      }
+
+      if (bBlocked)
+      {
+          if (OptionalRelevantTags && BlockedTag.IsValid())
+          {
+              OptionalRelevantTags->AddTag(BlockedTag);
+          }
+          return false;
+      }
+      if (bMissing)
+      {
+          if (OptionalRelevantTags && MissingTag.IsValid())
+          {
+              OptionalRelevantTags->AddTag(MissingTag);
+          }
+          return false;
+      }
+
+      return true;
+  }
+
+  #pragma endregion TagRelationship //}
+#+end_src
+
+* Gameplay Interaction(Plugin)
+
+* *Modular Game Features*
+
+** Setup
+
+Enable _Game Features_ and _Modular Gameplay_ plugin
+
++ Game Features :: Support for Game Feature and Actions
++ Modular Gameplay :: For add component
+
+*** Create Game Feature
+
+New Plugin -> Game Feature
+- Path :: Path/to/Project/Plugins/GameFeatures/
+- Content Browser
+  check "Show Plugin Content"
+
+*** GameFeatureData Asset
+
+*Do NOT rename it*
+
+defined behavior and Actions
+
+check ProjectSettings/AssetManager->PrimaryAssetType->Load GameFeatureData
+
+*** Actions
+
+*** =UGameFeaturesSubsystem= :: UEngineSubSystem
+
+**** UGameFeaturesProjectPolicies
+
+Defined which GameFeatures should be load
+
+***** UDefaultGameFeaturesProjectPolicies
+
+Load *All* GameFeatures
+
+***** Create GameSpecificPolicies
+
+#+begin_src cpp
+  GameSpecificPolicies = NewObject<UGameFeaturesProjectPolicies>(this, singletonClass);
+#+end_src
+
+***** Setup MyGameFeaturesProjectPolicies
+
+- .uplugin file
+  Define a Key(Metadata)
+  e.g. "MyGameVersion": 1.1,
+- ProjectSettings->Game - Game Features
+  - DEFAULT CLASSES->Game Feature Manager Class :: MyGameFeaturesProjectPolicies
+  - GAME FEATURES->Additional Plugin Metadata Keys :: MyGameVersion
+- C++
+  #+begin_src cpp
+  void UMyGameFeaturesProjectPolicies::InitGameFeatureManager()
+  {
+      auto AdditionalFilter = [&](const FString& PluginFilename, const FGameFeaturePluginDetails& PluginDetails, FBuiltInGameFeaturePluginBehaviorOptions& OutOptions) -> bool
+      {
+          if (const FString* MyGameVersion = PluginDetails.AdditionalMetadata.find(TEXT("MyGameVersion")))
+          {
+              float version = FCString::Atoi(**myGameVersion);
+              if (version > 2.0)
+              {
+                  return true;
+              }
+          }
+          return false;
+      };
+
+      UGameFeaturesSubsystem::Get().LoadBuiltInGameFeaturePlugins(AdditionalFilter);
+  }
+  #+end_src
+
+**** UGameFeaturesSubsystemSettings
+
+** Feature State
+
+* Mass (ECS)
+
+* Data layer
+
+* *Code Programming*
+
+** C++ Required
+
++ OOP
+
++ Polymorphism
+
++ Reflection and Garbage Collection (Unreal Implement)
+
+** Container
+
+*** =TArray=
+
+*** =TSet=
+
+*** =TMap=
+
+** =FString= & =FText= & =FName=
+
+| Class   | Bytes |
+|---------+-------|
+| =FString= |    40 |
+| =FText=   |    16 |
+| =FName=   |     4 |
+
+*** =FString=
+
+Mutable
+
+*** =FText=
+
+The primary component for text localization, all user-facing text should use this class.
+
+*** =FName=
+
+FNames are case-*insensitive*. They are immutable, and cannot be manipulated.
+
+*** =TEXT()= Macro
+
+#+begin_src cpp
+  "Hello World!";             // An ANSI character (8-bit fixed-width)  strlen("Hello") = 5;
+  L"Hello World!";            // In-memory only. wchar_t strlen(L"Hello") = 10;
+  TEXT("Hello World!");       // In-memory only. with portability
+
+  // Use TCHAR* type
+  const TCHAR* TcharString = TEXT("Hello World!");
+#+end_src
+
+** Smart Pointer =:Deleter=
+
+cannot be used with the UObject system
+
+*** =TSharedPtr<>=
+
+*** =TSharedRef<>=
+
+always reference a non-null object
+
+cannot change referencing object
+
+*** =TWeakPtr<>=
+
+Weak Pointers are similar to Shared Pointers, but do not own the object they reference, and therefore do not affect its lifecycle. This property can be very useful, as it breaks reference cycles, but it also means that a Weak Pointer can become null at any time, without warning. For this reason, a Weak Pointer can produce a Shared Pointer to the object it references, ensuring programmers safe access to the object on a temporary basis.
+
+*** =TUniquePtr<>=
+
+Since there can only be one Unique Pointer to a given resource, Unique Pointers can transfer ownership, but cannot share it.
+
+** Delegates
+
+*** Single
+
+#+begin_src cpp
+  DECLARE_DELEGATE(FDelegateName);
+
+  UENUM(BlueprintType)
+  enum class EDelegateType:uint8
+  {
+      Static,
+      Raw,
+      Lambda,
+      SP,
+      Object,
+      UFUNCTION,
+      WeakLambda,
+  };
+
+  class USomeClass : public UObject
+  {
+      GENERATED_BODY()
+
+  public:
+      FDelegateName MyDelegate;
+
+      FDelegateName& BindDemonstration(EDelegateType Type);
+  };
+#+end_src
+
+#+begin_src cpp
+  FDelegateName& USomeClass::BindDemonstration(EDelegateType Type)
+  {
+      if (MyDelegate.IsBound())
+      {
+          MyDelegate.UnBind();
+      }
+
+      switch (Type)
+      {
+          case EDelegateType::Static:
+              MyDelegate.BindStatic(&SomeRawObject::StaticFoo);
+              break;
+          case EDelegateType::Raw:
+              if (!RawObjectPtr.IsValid())
+              {
+                  RawObjectPtr = MakeShareable(new SomeRawObject);
+              }
+              MyDelegate.BindRaw(RawObjectPtr.Get(), &SomeRawObject::Foo);
+              break;
+          case EDelegateType::Lambda:
+              MyDelegate.BindLambda(
+                  [](void)
+                  {
+                      UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
+                  }
+              )
+              break;
+          case EDelegateType::SP:
+              if (!RawObjectPtr.IsValid())
+              {
+                  RawObjectPtr = MakeShareable(new SomeRawObject);
+              }
+              MyDelegate.BindSP(RawObjectPtr.ToSharedRef(), &SomeRawObject::Foo);
+              break;
+          case EDelegateType::Object:
+              if (SomeUObject == nullptr)
+              {
+                  SomeUObject = NewObject<USomeDelegateObject>();
+              }
+              MyDelegate.BindUObject(SomeUObject, &USomeDelegateObject::Foo);
+              break;
+          case EDelegateType::UFUNCTION:
+              if (SomeUObject == nullptr)
+              {
+                  SomeUObject = NewObject<USomeDelegateObject>();
+              }
+              MyDelegate.BindUFunction(SomeUObject, "Foo");
+              break;
+          case EDelegateType::WeakLambda:
+              if (SomeUObject == nullptr)
+              {
+                  SomeUObject = NewObject<USomeDelegateObject>();
+              }
+              MyDelegate.BindWeakLambda(SomeUObject,
+                  [](void)
+                  {
+                      UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
+                  }// Will not execute if SomeUObject is null
+              )
+          default:
+              break;
+      }
+  }
+
+  MyDelegate.ExecuteIfBound();
+#+end_src
+
+*** Multicast
+
+cannot use return values
+
+**** Events
+
+Only invoke inside class
+
+#+begin_src cpp
+  DECLARE_EVENT(USomeClass, FEventName);
+
+  MyEvent.Broadcast();
+#+end_src
+
+*** Dynamic (UObject, serializable)
+
+Dynamic delegates  can be serialized, slower than regular delegates
+
+do not supports payload variables
+
+** Interface
+
+*** Use Interface
+
+#+begin_src cpp
+  #include "ISomeInterface.h"
+
+  //if (Actor->GetClass()->ImplementsInterface(USomeInterface::StaticClass))
+  //if (Actor->Implements<USomeInterface>())
+  //{
+  //    Cast<ISomeInterface>(Actor)->Foo();// For calling C++ only inplementation
+  //    ISomeInterface::Execute_Foo(Actor);// For calling blueprint inplementation
+  //}
+
+  if (ISomeInterface* interface = Cast<ISomeInterface>(Actor))
+  {
+      interface->Foo();// For calling C++ only inplementation
+      interface->Execute_Foo(Actor);// For calling blueprint inplementation
+  }
+#+end_src
+
+** =TAttribute=
+
+** Blueprint Node
+
+*** Node Parameters
+
+References that are _const_ are always *input* parameters
+
+References are _non-const_ are always *output* parameters, use =UPARAM(ref)= to convert them to input parameters
+
+#+begin_src cpp
+  UFUNCTION(BlueprintCallable, Category = "Test")
+  void MyTestFunction(
+      const TArray<float>& inParam1,       // Input parameter, required
+      UPARAM(ref) TArray<float>& inParam2, // Input parameter, required
+      TArray<float>& outParam1,              // Output parameter
+      const AActor* inParam3,              // Input parameter, not required
+      UPARAM(ref) AActor* inParam4,        // Input parameter, required
+      AActor* inParam5,                    //
+      AActor*& outParam2,                    // Output parameter
+      const int32 inParam6,                // Input parameter, not required
+      UPARAM(ref) int32 inParam7,          // Input parameter, required
+      int32 inParam8,                      // Input parameter, not required
+      const int32& inParam9,               // Input parameter, required
+      int32& outParam3                       // Output parameter
+  );
+#+end_src
+
+#+ATTR_HTML: width="500px"
+#+ATTR_ORG: :width 500
+[[./images/ufunction_input_output_parameters.png]]
+
+*** Multi Execs Pin
+
+#+begin_src cpp
+  UENUM()
+  enum class EMultiOutputExecPin : uint8
+  {
+      _True,
+      _False,
+  };
+#+end_src
+
+#+begin_src cpp
+  UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Result"))
+  void MyIfNode(bool Value, EMultiOutputExecPin& Result) {// MultiInput - EMultiOutputExecPin Result
+      Result = Value ? EMultiOutputExecPin::_True : EMultiOutputExecPin::_False;
+  }
+#+end_src
+
+*** Blueprint Async Node
+
+**** header
+
+#+begin_src cpp
+  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMyAsyncNodeResult, int32, Result);
+
+  UCLASS()
+  class UMyBlueprintAsyncActionBase : public UBlueprintAsyncActionBase
+  {
+      GENERATED_BODY()
+
+      UPROPERTY(BlueprintAssignable)
+      FMyAsyncNodeResult OnSuccess;
+
+      UPROPERTY(BlueprintAssignable)
+      FMyAsyncNodeResult OnFail;
+
+      UFUNCTION(BlueprintCallable)
+      static UMyBlueprintAsyncActionBase* UMyBlueprintAsyncActionBase::FooNode();
+  };
+#+end_src
+
+**** cpp
+
+#+begin_src cpp
+  UMyBlueprintAsyncActionBase* UMyBlueprintAsyncActionBase::FooNode()
+  {
+      UMyBlueprintAsyncActionBase* Node = NewObject<UMyBlueprintAsyncActionBase>();
+
+      if ()
+      {
+          Node->OnSuccess.Broadcast(SuccessResult);
+      }
+      else
+      {
+          Node->OnFail.Broadcast(FailResult);
+      }
+
+      return Node;
+  }
+#+end_src
+
+** Async
+
+*** Timer
+
+** Multithreading
+
+*** =FRunnable=
+
+Interface for "runnable" objects.
+
+A runnable object is an object that is "run" on an arbitrary thread. The call usage pattern is Init(), Run(), Exit(). The thread that is going to "run" this object always uses those calling semantics. It does this on the thread that is created so that any thread specific uses (TLS, etc.) are available in the contexts of those calls. A "runnable" does all initialization in Init().
+
+If initialization fails, the thread stops execution and returns an error code. If it succeeds, Run() is called where the real threaded work is done. Upon completion, Exit() is called to allow correct clean up.
+
+**** Usage
+
+***** header
+
+#+begin_src cpp
+  #pragma once
+  #include "HAL/Runnable.h"
+
+  class FMyRunnable : public FRunnable
+  {
+  public:
+      FMyRunnable(FString ThreadName):MyThreadName(ThreadName);
+
+      //~FRunnable interface
+      virtual bool Init() override;
+      virtual uint32 Run() override;
+      virtual void Exit() override;
+      //~End of FRunnable interface
+
+      FString MyThreadName;
+
+  private:
+      static FCriticalSection CriticalSection;// for thread sync
+  };
+#+end_src
+
+***** cpp
+
+#+begin_src cpp
+  #include "MyRunnable.h"
+  #include "HAL/RunnableThread.h"
+
+  FCriticalSection FMyRunnable::CriticalSection;
+
+  uint32 FMyRunnable::Run()
+  {
+      while (IsValid())
+      {
+          FScopeLock Lock(&CriticalSection);// thread sync
+
+          ...
+      }//~FScopeLock here
+  }
+#+end_src
+
+***** object
+
+#+begin_src cpp
+  FMyRunnable* Runnable1 = new FMyRunnable(TEXT("Thread1"));
+  FRunnableThread* RunnableThread1 = FRunnableThread::Create(Runnable1, *Runnable1->MyThreadName);
+#+end_src
+
+*** AsyncTask
+
+*** TaskGraph
+
+** =UE_LOG= Tool
+
+#+begin_src cpp
+  int myInt{ 42 }; // Use Aggregate initialization
+  float myFloat{ 3.14f };
+  bool myBool{ true };
+  UE_LOG(LogTemp, Warning, TEXT("int: %d, float: %f, bool: %d"), myInt, myFloat, myBool);
+
+  FString mtString{ TEXT("My String!") };
+  UE_LOG(LogTemp, Warning, TEXT("FString mtString: %s"), *myString);
+  UE_LOG(LogTemp, Warning, TEXT("Name of Instance: %s"), *GetName());
+  // The asterisk(*) here is not dereference but a overload to convert FString Object to C style string (const TCHAR array)
+#+end_src
+
+** Diagnostic Checks (*Asserts*)
+
+| Macro                                | Behavior                                                                                                                                            |
+|--------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| =check(Expression);=                   | only evaluate =Expression= and assert with a halt dialog if =Expression= is false in _non-shipping builds_                                                |
+| =checkSlow(Expression);=               | only evaluate =Expression= and assert with a halt dialog if =Expression= is false in _debug builds_                                                       |
+| =checkf(exp, FormattedText, ...);=     | same as =check=, outputs =FormattedText= to the log                                                                                                     |
+| =checkfSlow(exp, FormattedText, ...);= | same as =checkSlow=, outputs =FormattedText= to the log                                                                                                 |
+| =checkNoEntry();=                      | code that should be unreachable (default in switch), similar to check(false), require =DO_CHECK=1=                                                    |
+| =checkNoReentry();=                    | halts execution if the line is hit more than once                                                                                                   |
+| =checkNoRecursion();=                  | halts execution if the line is hit more than once without leaving scope                                                                             |
+| =unimplemented();=                     | don't use it, use pure virtual function instead                                                                                                     |
+| =verify(Expression);=                  | always evaluate =Expression=, but only assert with a halt dialog if =Expression= is false in _non-shipping builds_                                        |
+| =verifySlow(Expression);=              | always evaluate =Expression=, but only assert with a halt dialog if =Expression= is false in _debug builds_                                               |
+| =ensure(Expression);=                  | always evaluate =Expression=, but notifies the crash reporter (output log) on the first time rather than halting if =Expression= is false in _all builds_ |
+
+e.g. typical usage
+
+#+begin_src cpp
+  // I need an actor to work with, and can't continue without one
+  check(actor != nullptr);
+
+  // UpdatePlayer() needs to always run, but can continue in shipping builds even if it fails
+  verify(UpdatePlayer() == true);
+
+  // I want to print current call stack info when exp is false
+  ensureMsgf(vehicleIndex < Vehicles.Num, TEXT("Bad vehicleIndex");
+
+  if (vehicleIndex < Vehicles.Num)
+  {
+      // ensureMsgf will have reported the failure, but we can handle it anyway
+  }
+#+end_src
+
+If assert parameters is required to run on all builds, don't use =check=, use =verify= instead
+
+If it's just for debugging purposes and isn't required to run on a _shipping build_, then =check= is just fine
+
+The extra =checkSlow= and =verifySlow= are for doing extended validation (require =DO_GUARD_SLOW=1=, i.e. in _debug builds_)
+
+=check= and =verify= kill the process for people trying to work, use them sparingly, think of them as a big, red abort button
+
+=ensure= is often not visible enough, search for *=== Handled ensure: ===* where exceptions occurred
+
+=DO_CHECK=USE_CHECKS_IN_SHIPPING= in _test and shipping (without editor) build_
+
+*** Check
+
+=Expression= might NOT be evaluated in _shipping build_, only evaluate =Expression= if =DO_CHECK=1=
+
+The Check family is the closest to the base assert, in that members of this family halt execution when the first parameter evaluates to a false value, and do not run in shipping builds by default.
+
+*** Verify
+
+behaves identically to =check= when =DO_CHECK=1=, ensure =Expression= will be evaluated
+
+This means that you should use Verify macros only when the expression needs to run independently of diagnostic checks. For example, if you have a function that performs an action and then returns a bool indicating whether that action succeeded or failed, you should use Verify rather than Check to make sure that the action was successful. This is because, in shipping builds, Verify will ignore the return value, but will still perform the action. Check, however, will simply not call the function at all in shipping builds, resulting in different behavior.
+
+*** Ensure
+
+The Ensure family is similar to the Verify family, but works with non-fatal errors. This means that if an Ensure macro's expression evaluates as false, the Engine will inform the crash reporter, but will continue running. In order to avoid flooding the crash reporter, Ensure macros will only report once per Engine or Editor session. If your use case requires that an Ensure macro report every time its expression evaluates as false, use the "Always" version of the macro.
+
+** Actor Lifecycle
+
+*** Initialize
+
+- Initialize member variables with inline default values in header files
+- Perform any further trivial initialization in class constructors
+  For actors, use CreateDefaultSubobject to create components in class constructors
+- Class data member may then be modified by loading process
+  Virtual Function: *PreInitializeComponents*, *PostInitializeComponents* (usually preferred), *BeginPlay*
+
+*** Tick
+
+For components, use *TickComponent*
+
+- For actors class constructor
+  #+begin_src cpp
+    PrimaryActorTick.bCanEverTick = true;
+  #+end_src
+- For components
+  #+begin_src cpp
+    PrimaryComponentTick.bCanEverTick = true;
+  #+end_src
+
+*** Destruction
+
+within the *EndPlay* function
+
+any UPROPERTYs are automatically destroyed
+
+** Different ways to _instantiate_ the object
+
+To understand the difference between these functions, you need to remember that the object model in Unreal Engine is based on object prototypes, very much like in JavaScript. Each UClass is associated to a default instance of the associated UObject class, called the Class Default Object (CDO), which is allocated first and then constructed, only once, via the class constructor when the engine is initialised. The CDO acts as a template from which all other instances of the class are copied, and the constructor is never called again.
+
+This means class constructors cannot contain any runtime logic, and should only be used to initialise the CDO and its properties. If the class contains any subobjects, like actor components, these must do the same, so their own default objects must be constructed first. The actual instantiation of the object must then be deferred, after the engine has initialised, so that every time a new instance of the class is requested to be created by normal gameplay code, the parent object and all of its subobjects are instantiated from their respective defaults.
+
+So, the multiple ways of creating objects are necessary to handle all the different scenarios where an object may be created.
+
+- =UObject::CreateDefaultSubobject= is only callable in a class constructor, and takes care of creating an instance of the CDO of the subobject's class, setting its outer class as the caller object, among other things. The created object then becomes the default object for the property when its object class is instantiated.
+
+- =NewObject<T>= is the function normally used to instantiate objects after engine initialisation, during normal gameplay. It provides several convenience overloads to handle most scenarios.
+
+- =UWorld::SpawnActor<T>= is a convenience method to spawn actors in a level with the specified location and rotation, spawn collision settings, and checks to ensure it's a spawnable actor class, and is nothing more than a wrapper of =NewObject<AActor>=.
+
+- =ConstructObject= has been removed in favour of =NewObject=.
+
+- There's also =UGameplayStatics::SpawnObject=.
+
+I recommend checking the engine source code for more information, especially UObject/UObjectGlobal.cpp and UObject/UObjectGlobal.h in the CoreUObject engine module. Internally, all these function ultimately call (as of 4.24) =StaticConstructObject_Internal=, which handles the actual object creation.
+
+Replicating =CreateDefaultSubobject= by using =NewObject= is quite complex, as it does a lot of things for you. Check the source for the former and you'll see why it's so convenient. But yes, the rule of thumb is, =CreateDefaultSubobject= in class constructors, =NewObject= otherwise.
+
+[[https://docs.unrealengine.com/5.0/en-US/creating-unreal-objects/][Doc_UObject Instance Creation]]
+
+** Change CDO Subobject Class
+
+#+begin_src cpp
+  AActor::AActor(const FObjectInitializer& ObjectInitializer)
+      : Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName)
+              .SetDefaultSubobjectClass<...>(...))
+  {
+  }
+#+end_src
+
+** Get component without cast (less memory)
+
+Always need valid check
+
+Blueprint node =Get Component by Class=
+
+#+begin_src cpp
+  compPtr = FindComponentByClass<USphereComponent>();
+#+end_src
+
+** Blueprint Implementable Event
+
+*** header
+
+#+begin_src cpp
+  // Create Event
+  UFUNCTION(BlueprintImplementableEvent, Category = "BaseCharacter")
+  void OnDeath();
+#+end_src
+
+** Animation Montage
+
+*** header
+
+#+begin_src cpp
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation|Montage", meta = (AllowPrivateAccess = "true"))
+  class UAnimMontage* SomeMontage;
+#+end_src
+
+*** cpp
+
+#+begin_src cpp
+  #include "Animation/AnimMontage.h"
+
+  void AMyCharacter::foo()
+  {
+      if (SomeMontage)
+      {
+          PlayAnimMontage(SomeMontage);
+      }
+  }
+#+end_src
+
+** Enum
+
+*** Class UEnum
+
+#+begin_src cpp
+  UENUM(BlueprintType, Category = "Weapon")
+  enum class EWeaponState : uint8
+  {
+      Reloading UMETA(DisplayName = "Weapon Reloading"),
+      Equipping UMETA(DisplayName = "Weapon Equipping")
+  };
+#+end_src
+
+#+begin_src cpp
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+  EWeaponState WeaponState = EWeaponState::Equipping;
+#+end_src
+
+#+begin_src cpp
+  switch (WeaponState)
+  {
+  case EWeaponState::Reloading:
+      Foo();
+      break;
+  case EWeaponState::Equipping:
+      Bar();
+      break;
+
+  default:
+      break;
+  }
+#+end_src
+
+*** Bitmask UEnum
+
+Enum classes used as flags can take advantage of the =ENUM_CLASS_FLAGS(EnumType)= macro to automatically define all of the bitwise operators
+
+#+begin_src cpp
+  UENUM(BlueprintType, Category = "Weapon", meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+  enum class EWeaponState : uint8
+  {
+      None      = 0x00 UMETA(Hidden),
+      Reloading = 0x01 UMETA(DisplayName = "Weapon Reloading"),
+      Equipping = 0x02 UMETA(DisplayName = "Weapon Equipping")
+  };
+
+  ENUM_CLASS_FLAGS(EWeaponState)
+#+end_src
+
+#+begin_src cpp
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (Bitmask, BitmaskEnum = "EWeaponState"))
+  uint8 WeaponState = static_cast<uint8>(EWeaponState::Equipping);
+#+end_src
+
+**** truth context
+
+The one exception to this is the use of flags in a truth context - this is a limitation of the language. Instead, all flags enums should have an enumerator called =None= which is set to 0 for comparisons:
+#+begin_src cpp
+  // Old
+  if (Flags & EFlags::Flag1)
+
+  // New
+  if ((Flags & EFlags::Flag1) != EFlags::None)
+#+end_src
+
+**** Usage
+
+#+begin_src cpp
+  void ASampleActor::foo()
+  {
+      // Add flag
+      WeaponState |= static_cast<uint8>(EWeaponState::Reloading);
+
+      // Remove flag
+      // WeaponState &= ~static_cast<uint8>(EWeaponState::Reloading)
+
+      if ((WeaponState & static_cast<uint8>(EWeaponState::Reloading)) != EFlags::Reloading)
+      {
+          // Weapon is Reloading
+      }
+  }
+#+end_src
+
+** Pointers & References
+
+#+BEGIN_QUOTE
+Pointers & References
+
+from Unreal Engine Community Wiki
+
+So, for objects where being Null is a valid state (like anything that can be garbage collected such as UObjects), it makes sense to pass things by Pointer rather than by Reference. When you pass a value By Pointer, much like By Reference only 8 bytes are pushed onto the stack and object is not copied. The difference is that passing By Pointer is a explicit declaration that the value can be Null and you should absolutely check for that and handle the case where it is. If you pass By Reference, you are saying that it can never be Null.
+#+END_QUOTE
+
++ Pointers (*)
+  - Can be null.
+  - Have a memory address.
+  - Can be changed to point at something else than the previous pointed object.
+  - You can’t point to a reference.
+
++ References (&)
+  - Can reference a pointer or the object in memory itself.
+  - Have no address, thus you can’t assign a pointer to it.
+  - Once you declare it, you can’t change it to reference to something else.
+
+*** Always Check Your Pointers
+
+#+begin_src cpp
+  check(Ptr);// or
+  if(!Ptr) return;
+#+end_src
+
+
+** C++ *and* Blueprint
+
+No separate "Scripting API"
+
++ C++ - programming language
+  naturally better-suited for low-level game systems
++ Blueprint - scripting system
+  naturally better-suited for high-level behaviors, interactions, integrating assets and fine-tuning cosmetic details
+
+*** Performance
+
++ In terms of raw execution speed, C++ is faster
+  C++ code compile to machine code
+  Blueprint run through script VM at runtime
++ Blueprint Nativization (Deprecated)
+  buggy
+
+Use profiler
+
+*** Project Organization
+
+*** Access Controls
+
+#+begin_src cpp
+  class FSomeClass
+  {
+  public:
+    // Accessible to all other code
+
+  protected:
+    // Accessible to subclasses
+
+  private:
+    // Internal to this class alone
+  }
+#+end_src
+
+#+begin_src cpp
+  // Not exposed to Blueprints at all
+  UCLASS(NotBlueprintType, NotBlueprintable)
+
+  // Can be referenced but not extended
+  UCLASS(BlueprintType, NotBlueprintable)
+
+  // Can be extended in Blueprints
+  UCLASS(BlueprintType, Blueprintable)
+#+end_src
+
+#+begin_src cpp
+  // Read-only to both users and blueprints
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+
+  // Can't be modified per-instance, but a new default value can be set per-Blueprint
+  UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+
+  // Can be modified in the Details panel and by Blueprints
+  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+#+end_src
+
+*** difference
+
+** C++ vs. Blueprint Implementation
+
+*** Input
+
+**** Movement
+
+Setup input in project setting first
+
+In some ACharacter class
+
+***** C++
+
++ .h
+#+begin_src cpp
+protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
+
+    // Called for forwards/backwards input
+    void MoveForward(float Value);
+
+    // Called for side to side input
+    void MoveRight(float Value);
+#+end_src
++ .cpp
+#+begin_src cpp
+void AShooterCharacter::MoveForward(float Value)
+{
+    if ((Controller != nullptr) && (Value != 0.0f))
+    {
+        // Find out which way is forward
+        const FRotator Rotation{ Controller->GetControlRotation() };
+        const FRotator YawRotation{ 0,Rotation.Yaw,0 };
+
+        const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
+        AddMovementInput(Direction, Value);
+    }
+}
+
+void AShooterCharacter::MoveRight(float Value)
+{
+    if ((Controller != nullptr) && (Value != 0.0f))
+    {
+        // Find out which way is forward
+        const FRotator Rotation{ Controller->GetControlRotation() };
+        const FRotator YawRotation{ 0,Rotation.Yaw,0 };
+
+        const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y) };
+        AddMovementInput(Direction, Value);
+    }
+}
+#+end_src
+
+#+begin_src cpp
+// Called to bind functionality to input
+void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    check(PlayerInputComponent);
+
+    PlayerInputComponent->BindAxis("MoveForward", this, &AShooterCharacter::MoveForward);
+    PlayerInputComponent->BindAxis("MoveRight", this, &AShooterCharacter::MoveRight);
+}
+#+end_src
+
+***** Blueprint
+
+#+ATTR_HTML: width="900px"
+#+ATTR_ORG: :width 900
+[[./images/movement_input_blueprint.png]]
+
+**** Turn and LookUp
+
+***** C++
+
++ .h
+#+begin_src cpp
+protected:
+    /**
+    * Called via input to turn at a given rate.
+    * @param Rate  This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+    */
+    void TurnAtRate(float Rate);
+
+    /**
+    * Called via input to look up/down at a given rate.
+    * @param Rate  This is a normalized rate, i.e. 1.0 means 100% of desired rate
+    */
+    void LookUpAtRate(float Rate);
+
+    /**
+    * Rotate controller based on mouse X movement
+    * @param Value   The input value from mouse movement
+    */
+    void Turn(float Value);
+
+    /**
+    * Rotate controller based on mouse Y movement
+    * @param Value   The input value from mouse movement
+    */
+    void LookUp(float Value);
+#+end_src
+
+#+begin_src cpp
+private:
+    // Base turn rate, in deg/sec. Other scaling may affect final turn rate
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+    float BaseTurnRate;
+
+    // Base look up/down rate, in deg/sec. Other scaling may affect final turn rate
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+    float BaseLookUpRate;
+
+    /** Scale factor for mouse look sensitivity. Turn rate when not aiming. */
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+    float MouseHipTurnRate;
+
+    /** Scale factor for mouse look sensitivity. Look up rate when not aiming. */
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+    float MouseHipLookUpRate;
+
+    /** Scale factor for mouse look sensitivity. Turn rate when aiming. */
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+    float MouseAimingTurnRate;
+
+    /** Scale factor for mouse look sensitivity. Look up rate when aiming. */
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+    float MouseAimingLookUpRate;
+#+end_src
++ .cpp
+#+begin_src cpp
+void AShooterCharacter::TurnAtRate(float Rate)
+{
+    // Calculate delta for this frame from the rate information
+    AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds()); // deg/sec * sec/frame
+}
+
+void AShooterCharacter::LookUpAtRate(float Rate)
+{
+    AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds()); // deg/sec * sec/frame
+}
+
+void AShooterCharacter::Turn(float Value)
+{
+    float TurnScaleFactor{};
+    if (bAiming)
+    {
+        TurnScaleFactor = MouseAimingTurnRate;
+    }
+    else
+    {
+        TurnScaleFactor = MouseHipTurnRate;
+    }
+    AddControllerYawInput(Value * TurnScaleFactor);
+}
+
+void AShooterCharacter::LookUp(float Value)
+{
+    float LookUpScaleFactor{};
+    if (bAiming)
+    {
+        LookUpScaleFactor = MouseAimingLookUpRate;
+    }
+    else
+    {
+        LookUpScaleFactor = MouseHipLookUpRate;
+    }
+    AddControllerPitchInput(Value * LookUpScaleFactor);
+}
+#+end_src
+
+#+begin_src cpp
+void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    check(PlayerInputComponent);
+
+    PlayerInputComponent->BindAxis("TurnRate", this, &AShooterCharacter::TurnAtRate);
+    PlayerInputComponent->BindAxis("LookUpRate", this, &AShooterCharacter::LookUpAtRate);
+    PlayerInputComponent->BindAxis("Turn", this, &AShooterCharacter::Turn);
+    PlayerInputComponent->BindAxis("LookUp", this, &AShooterCharacter::LookUp);
+}
+#+end_src
+
+***** Blueprint
+
+#+ATTR_HTML: width="420px"
+#+ATTR_ORG: :width 420
+[[./images/mouse_input_blueprint.png]]
+#+ATTR_HTML: width="700px"
+#+ATTR_ORG: :width 700
+[[./images/gamepad_input_blueprint.png]]
+
+*** Trace
+
+**** Weapon Trace
+
+***** C++
+
+#+begin_src cpp
+  void AWeapon::RunWeaponTrace(const FTransform& MuzzleTransform, float TraceDistance)
+  {
+      const FVector TraceStart = MuzzleTransform.GetLocation();
+      const FVector TraceEnd = TraceStart + (MuzzleTransform.GetUnitAxis(EAxis::X) * TranceDistance);
+      const FCollisionQueryParams QueryParams(TEXT("WeaponTrace"), false, this);
+
+      FHitResult Hit;
+      if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_WeaponFire, QueryParams))
+      {
+          const float DamageAmount = 1.0f;
+          const FVector ShotFromDirection = (TraceEnd - TraceStart).GetSafeNormal();
+          const TSubclassOf<UDamegeType> DamegeTypeClass = UDamageType_WeaponFire::StaticClass();
+          const FPointDamageEvent DamageEvent(DamageAmount, Hit, ShotFromDirection, DamageTypeClass);
+          Hit.Actor->TakeDamege(DamageAmount, DamegeEvent, OwningController, this);
+      }
+  }
+#+end_src
+
+***** Blueprint
+
+Trace
+
+*** Collision Component Overlap
+
+**** header
+
+#+begin_src cpp
+UFUNCTION()
+void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+UFUNCTION()
+void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+#+end_src
+
+**** cpp
+
++ header
+  #+begin_src cpp
+  #include "Components/SphereComponent.h"
+  #+end_src
++ constructor
+  #+begin_src cpp
+  Trigger->OnComponentBeginOverlap.AddDynamic(this, &AMyActor::OnOverlapBegin);
+  Trigger->OnComponentEndOverlap.AddDynamic(this, &AMyActor::OnOverlapEnd);
+  #+end_src
++ function
+  #+begin_src cpp
+  void ALookAtActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+  {
+      if (OtherActor && (OtherActor != this) && OtherComp)
+      {
+      }
+  }
+
+  void ALookAtActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+  {
+      if (OtherActor && (OtherActor != this) && OtherComp)
+      {
+      }
+  }
+  #+end_src
+
+*** Timeline
+
+**** Blueprint
+
+#+ATTR_HTML: width="900px"
+#+ATTR_ORG: :width 900
+[[./images/timeline_implement_blueprint.png]]
+
+**** C++
+
+***** Create Curve Asset
+
+***** header
+
+#+begin_src cpp
+    class UTimelineComponent* MyTimeline;
+
+public:
+    UPROPERTY(EditAnywhere, Category = "Timeline")
+    UCurveFloat* MyCurve;
+
+    UPROPERTY()
+    FVector StartLocation;
+
+    UPROPERTY()
+    FVector EndLocation;
+
+    UPROPERTY(EditAnywhere, Category = "Timeline")
+    float ZOffset;
+
+    UFUNCTION()
+    void TimelineFloatReturn(float value);
+
+    UFUNCTION()
+    void OnTimelineFinished();
+#+end_src
+
+***** cpp
+
++ include
+  #+begin_src cpp
+  #include "Components/TimelineComponent.h"
+  #+end_src
++ Constructor
+  #+begin_src cpp
+  MyTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+  // Setting timeline's settings before start it
+  MyTimeline->SetLooping(false);
+  MyTimeline->SetIgnoreTimeDilation(true);
+
+  ZOffset = 50.f;
+  #+end_src
++ BeginPlay
+  #+begin_src cpp
+    if (MyCurve)
+    {
+        // Declare delegate function to be binded with TimelineFloatReturn(float value)
+        FOnTimelineFloat TimelineCallback;
+        // Declare delegate function to be binded with OnTimelineFinished()
+        FOnTimelineEvent TimelineFinishedCallback;
+
+        TimelineCallback.BindUFunction(this, FName("TimelineFloatReturn"));
+        TimelineFinishedCallback.BindUFunction(this, FName{ "OnTimelineFinished" });
+        // Add the float curve to the timeline and connect it to the interpfunction's delegate
+        MyTimeline->AddInterpFloat(MyCurve, TimelineCallback, FName("Alpha"));
+        // Add on timeline finished function
+        MyTimeline->SetTimelineFinishedFunc(TimelineFinishedCallback);
+
+        // Setting vectors
+        StartLocation = GetActorLocation();
+        EndLocation = FVector(StartLocation.X, StartLocation.Y, StartLocation.Z + ZOffset);
+
+        // Start timeline
+        MyTimeline->Play();
+    }
+  #+end_src
++ TimelineFloatReturn(float value)
+  #+begin_src cpp
+  SetActorLocation(FMath::Lerp(StartLocation, EndLocation, value));
+  #+end_src
++ OnTimelineFinished()
+  #+begin_src cpp
+  if (MyTimeline->GetPlaybackPosition() == 0.f)
+  {
+      MyTimeline->Play();
+  }
+  else if (MyTimeline->GetPlaybackPosition() == MyTimeline->GetTimelineLength())
+  {
+      MyTimeline->Reverse();
+  }
+  #+end_src
+
+*** Death Ragdoll
+
+**** Blueprint
+
+#+ATTR_HTML: width="1000px"
+#+ATTR_ORG: :width 1000
+[[./images/character_death_ragdoll.png]]
+
+**** C++
+
+***** cpp
+
+#+begin_src cpp
+  DetachFromControllerPendingDestroy();
+  UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+  CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+  GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+  SetActorEnableCollision(true);
+
+  // Ragdoll
+  GetMesh()->SetAllBodiesSimulatePhysics(true);
+  GetMesh()->SetSimulatePhysics(true);
+  GetMesh()->WakeAllRigidBodies();
+  GetMesh()->bBlendPhysics = true;
+
+  UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+  if (CharacterComp)
+  {
+      CharacterComp->StopMovementImmediately();
+      CharacterComp->DisableMovement();
+      CharacterComp->SetComponentTickEnabled(false);
+  }
+
+  SetLifeSpan(30.0f);
+#+end_src
+
+* Math Snippets
+
+** Degrees & Radians
+
+Convert from radians to degrees
+
+#+begin_src cpp
+  float degrees = FMath::RadiansToDegrees(radians);
+#+end_src
+
+And degrees to radians
+
+#+begin_src cpp
+  float radians = FMath::RadiansToDegrees(degrees);
+#+end_src
+
+Check measurement for all these angular functions
+
+e.g. =Sine= used in material construction uses a range of *1*
+
+** Ratios
+
+parametric scale between 0 and 1
+
+#+begin_src cpp
+  float duration = 5.0f;
+  float fullyGrown = 75.0f;
+  float ratio = (currentTime < duration) ? (currentTime / duration) : 1.0f;
+  float currentGrowth = fullyGrown * ratio;
+#+end_src
+
+A general function
+
+#+begin_src cpp
+  float GetRatio(float value, float minimum, float maximum, bool clamp = true)
+  {
+      if (value > maximum && clamp == tru)
+      {
+          return 1.0f;
+      }
+      else if (value > minimum)
+      {
+          return (value - minimum) / (maximum - minimum);
+      }
+      else
+      {
+          return 0.0f;
+      }
+  }
+#+end_src
+
+e.g. Sound falloff
+
+#+begin_src cpp
+  float GetSoundFalloff((float minDistance, float maxDistance, const FVector& soundLocation, const FVector& listenerLocation)
+  {
+      float distance = (soundLocation - listenerLocation).Size();
+      float ratio = GetRatio(distance, minDistance, maxDistance);
+      float falloff = FMath::Pow(1.0f - ratio, 2.0f);
+
+      return falloff;
+  }
+#+end_src
+
+** Trigonometry
+
+An easing function for a linear ratio (ease In and Out)
+
+#+begin_src cpp
+  float easedRatio = 1.0f - ((FMath::Cos(linearRatio * PI) * 0.5f) + 0.5f);
+#+end_src
+
+#+ATTR_HTML: width="200px"
+#+ATTR_ORG: :width 200
+[[./images/trigonometry_easing_ratio_func.png]]
+
+Can make noise from =Sine= (oscillator)
+
+e.g. smoke trail
+
+=Tangent= is uncommon in game code, but have a special place in camera code
+
+Unreal use horizontal FOV
+
+#+begin_src cpp
+  float GetVerticalFOV(float horizontalFOVDegrees, float viewportWidth, float viewportHeight)
+  {
+      float aspectRatio = viewportWidth / viewportHeight;
+      float horizontalFOVRadians = FMath::DegreesToRadians(horizontalFOVDegrees);
+      float verticalFOVRadians = FMath::Atan(FMath::Tan(horizontalFOVRadians * 0.5f) / aspectRatio) * 2.0f;
+
+      return FMath::RadiansToDegrees(verticalFOVRadians);
+  }
+#+end_src
+
+** Abs & Sign
+
+=FMath::Sign= returns -1, 0, or +1, depending on input value
+
+#+begin_src cpp
+  float UnitSign(const float x)
+  {
+      return (x >= 0) ? 1 : -1;
+  }
+#+end_src
+
+e.g. produce radians within the 0 to 2\pi range
+
+#+begin_src cpp
+  float GetNormalizedUnsignedRadians(float x)
+  {
+      x = FMath::Fmod(x, PI * 2.0f * UnitSign(x));
+
+      if (x < 0.0f)
+      {
+          x = (PI * 2.0f) + x;
+      }
+
+      return x;
+  }
+#+end_src
+
+** Pow
+
+Used a lot in game code, most often to shape a linear ratio (easing)
+
+Often replace the use of the more expensive =FRuntimeFloatCurve=
+
+e.g. A HUD indicator, when a new target appears on the screen, with some pop
+
+#+begin_src cpp
+  float timeToPop = 0.25f;
+  float ratio = GetRatio(currentTime, 0.0f, timeToPop);
+  float scale = FMath::Pow(ratio, 0.25f);
+#+end_src
+
+=FMath::Pow= only work with positive numbers
+
+This function returns either the positive or negative direction, depending the sign of input
+
+#+begin_src cpp
+  float NegativePow(float a, float b)
+  {
+      return FMath::Pow(FMath::Abs(a), b) * FMath::Sign(a);
+  }
+#+end_src
+
+** Interpolation
+
+=FMath::Lerp=
+
+Ratio can be greater than 1, but we don't do this often
+
+e.g. Bilinear filter
+
+#+ATTR_HTML: width="200px"
+#+ATTR_ORG: :width 200
+[[./images/lerp_bilinear_filtering_color.png]]
+
+#+begin_src cpp
+  FVector3 GetColor(const FVector2& coordinate, const FBitmap& bitmap)
+  {
+      auto cc = coordinate + FVector2(0.5f, 0.5f);
+      auto x0 = FMath::Max(0.0f, FMath::FloorToInt(cc.X));
+      auto x1 = FMath::Min(bitmap.GetWidth() - 1, FMath::CeilToInt(cc.X));
+      auto y0 = FMath::Max(0.0f, FMath::FloorToInt(cc.Y));
+      auto y1 = FMath::Min(bitmap.GetHeight() - 1, FMath::CeilToInt(cc.Y));
+      auto xr = FMath::Frac(coordinate.X);// FMath::Frac returns the fractional part of value
+      auto yr = FMath::Frac(coordinate.Y);// e.g. Frac(7.62) returns 0.62
+      auto c0 = FMath::Lerp(bitmap.GetColor(x0, y0), bitmap.GetColor(x0, y1), yr);
+      auto c1 = FMath::Lerp(bitmap.GetColor(x1, y0), bitmap.GetColor(x1, y1), yr);
+
+      return FMath::Lerp(c0, c1, xr);
+  }
+#+end_src
+
+** Easing in and out
+
+Ease in, starting slowly before gathering speed
+
+#+begin_src cpp
+  float EaseIn(float ratio, float easeRate = 2.0f)
+  {
+      return FMath::Pow(ratio, easeRate);
+  }
+#+end_src
+
+Ease out, slowing down to a stop
+
+#+begin_src cpp
+  float EaseOut(float ratio, float easeRate = 2.0f)
+  {
+      return 1.0f - FMath::Pow(1.0f - ratio, easeRate);
+  }
+#+end_src
+
+Ease both in and out
+
+#+begin_src cpp
+  float EaseInOut(float ratio, float easeRate = 2.0f)
+  {
+      if (ratio < 0.5f)
+      {
+          return 0.5f * FMath::Pow(2.0f * ratio, easeRate);
+      }
+      else
+      {
+          return 1.0f - (0.5f * FMath::Pow(2.0f * (1.0f - ratio), easeRate));
+      }
+  }
+#+end_src
+
+** Time-based Smoothing
+
+e.g. Smoothing camera movement
+
+Often through taking x% of the last frame's value and (100-x)% of this frame's value
+
+Blending from one frame to the next, using interpolation
+
+#+begin_src cpp
+  float GetYaw(float oldYaw, float targetYaw, float smoothingRatio)
+  {
+      return FMath::Lerp(targetYaw, oldYaw, smoothingRatio);
+  }
+#+end_src
+
+This works fine if the frame rate is _perfectly constant_, we need something to modify the smoothing ratio in concert with that is happening with the frame rate
+
+#+begin_src cpp
+  float GetSmoothingRatio(float ratio, float deltaSeconds, float authoredFPS = 60.0f)
+  {
+      float timeRatio = deltaSeconds * authoredFPS;// if actual FPS is authored FPS, timeRatio = 1
+
+      if ((ratio > 0.0f) && (timeRatio > 0.0f))
+      {
+          return FMath::Pow(ratio, timeRatio);
+      }
+
+      return ratio;
+  }
+#+end_src
+
+#+begin_src cpp
+  float GetYaw(float oldYaw, float targetYaw, float smoothingRatio, float deltaSeconds)
+  {
+      return FMath::Lerp(targetYaw, oldYaw, GetSmoothingRatio(smoothingRatio, deltaSeconds));
+  }
+#+end_src
+
+e.g. Trail parameter
+
+#+begin_src cpp
+  FVector velocity = vehicle->GetComponentVelocity();
+
+  Velocity = FMath::Lerp(velocity, Velocity, GetSmoothingRatio(0.8f, deltaSeconds));// Velocity is a member variable of trail class
+#+end_src
+
+** Random Number Generation (RNG)
+
+Unreal Engine uses the C runtime =rand= function, you might consider an alternative, the Mersenne Twister algorithm is quite popular.
+
+=FMath::RandRange= used to generate a random number between range
+
+- =int32 RandHelper(int32 Max)=
+- =int64 RandHelper64(int64 Max)=
+- =bool RandBool()=
+- =FVector VRandCone(FVector const& Dir, float ConeHalfAngleRad)=
+- =FVector VRandCone(FVector const& Dir, float HorizontalConeHalfAngleRad, float VerticalConeHalfAngleRad)=
+- =FVector2D RandPointInCircle(float CircleRadius)=
+- =FVector RandPointInBox(const FBox& Box)=
+
+Unreal Engine sets seed from the clock, the RNG is a shared resource
+
+If you want it to be predictable, then call =FMath::RandInit= with a fixed value
+
+=FRandomStream= provide exclusive random numbers, but it's not great, very bad quality in the lower bits. Don't use the modulus (%) operator.
+
+=FRandomFast= is pretty bare bones, but easily extended
+
+Random can produce seemingly non-random numbers quite easily, if not statistically very likely
+
+If you want to avoid repeating numbers, then you might want to develop a random, no repeat feature
+
+You can wrap such a feature into a class for compartmentalized access for a variety of use cases
+
+#+begin_src cpp
+  class FRandomNoRepeats
+  {
+
+  public:
+
+      int32 LastResult = 0;
+
+      int32 RandRange(int32 minimum, int32 maximum)
+      {
+          int32 attempts = 0;
+          int32 result = FMath::RandRange(minimum, maximum);
+
+          while (result == LastResult && ++attempts < 100)
+          {
+              result = FMath::RandRange(minimum, maximum);
+          }
+
+          LastResult = result;
+
+          return result;
+      }
+  };
+#+end_src
+
+Store an instance of this object in your own class like this:
+
+#+begin_src cpp
+  FRandomNoRepeats GenerateRandom;
+#+end_src
+
+And call it like this:
+
+#+begin_src cpp
+  int32 randomNumber = GenerateRandom.RandRange(0, 10);
+#+end_src
+
+** Vectors
+
+*** Dot Product
+
+For normalized vectors
+
+- +1 :: parallel
+- 0 :: perpendicular
+- -1 :: parallel in opposite direction
+
+#+begin_src cpp
+  float angle = FMath::RadiansToDegrees(FMath::Acos(dotProduct));
+#+end_src
+
+e.g. Determine a point in front of an object facing a given direction?
+
+#+begin_src cpp
+  bool IsInFront(const FVector& point, const FVector& of, const FVector& direction)
+  {
+      return (FVector::DotProduct(point - of, direction) > 0.0f);// Don't even need to normalize the vector, just need to know if the result is positive
+  }
+#+end_src
+
+e.g. If a vehicle is facing the right direction for a given section of track?
+
+#+begin_src cpp
+  bool IsFacingForwards(const FVector& vehicleDirection, const FVector& trackDirection, float angleRange)
+  {
+      float dotResult = FVector::DotProduct(vehicleDirection, trackDirection);
+      float angleResult = FMath::RadiansToDegrees(FMath::Acos(dotResult));
+
+      return (angleResult < angleRange);
+  }
+#+end_src
+
+e.g. Determine the intersection point between a ray and a plane
+
+#+begin_src cpp
+bool RayPlaneIntersection(const FVector& rayOrigin, const FVector& rayDirection, const FVector& planeOrigin,
+                          const FVector& planeNormal, FVector& intersection)
+{
+    float cosAlpha = FVector::DotProduct(rayDirection, planeNormal);
+
+    if (cosAlpha >= 0.0f)
+    {
+        return false;
+    }
+
+    float dotDifference = FVector::DotProduct(planeNormal, planeOrigin - rayOrigin);
+    float delta = dotDifference / cosAlpha;
+
+    if (delta < 0.0f)
+    {
+        return false;
+    }
+
+    intersection = rayOrigin + (rayDirection * delta);
+
+    return true;
+}
+#+end_src
+
+*** Cross Product
+
+e.g. Calculate 3 right-angled vector from one forward vector and one notional up vector
+
+#+begin_src cpp
+  void GetRightUpVectors(const FVector& forward, FVector& right, FVector& up)
+  {
+      right = FVector::CrossProduct(up, forward);
+      right.Normalize();
+
+      up = FVector::CrossProduct(forward, right);
+  }
+#+end_src
+
+** Quaternions
+
+=FQuat=
+
+Use =FQuat::Slerp= to interpolate on hypersphere, guaranteed shortest distance
+
+** Rotators
+
+=FRotator=
+
+Use roll, pitch, yaw in _degrees_, clockwise for positive, anti-clockwise for negative, can be greater than 360 degrees
+
+always between -180 and 180 degrees when converted from a quaternion (normalized)
+
+=FMath::Lerp= takes the shortest distance between two rotations, never interpolates for more than 180 degrees
+
+=FMath::LerpRange= taking the longest route, especially useful for accumulated rotations
+
+=FMath::RInterpTo= interpolates between rotations over time, not as accurate as time-based smoothing, but accurate enough
+
+You can convert a rotator to a vector (from a FVector(1.0f, 0.0f, 0.0f)) pointing in the direction implied by the rotator
+
+e.g. Direction a camera pointing in
+
+#+begin_src cpp
+  FRotator rotator = camera->GetComponentRotation();
+  FVector direction = rotator.Vector();
+#+end_src
+
+=RotateVector()= method to rotate vector
+
+** Transforms
+
+=FTransform=
+
+Transforming an array of positions like this can be done easily
+
+#+begin_src cpp
+  TArray<FVector> ProcessPositions(const TArray<FVector>& positions, const FTransform& transform)
+  {
+      TArray<FVector> output;
+
+      for (const FVector& position : positions)
+      {
+          output.Add(transform.TransformPosition(position));
+      }
+
+      return output;
+  }
+#+end_src
+
+=TransformPosition= returns =Rotation.RotateVector(Scale3D * Vector) + Translation=
+
+** Coordinate Spaces
+
+Described by =FTransform=
+
+e.g. Transform from world space into vehicle space
+
+#+begin_src cpp
+  FTransform vehicleSpace = vehicle->GetActorTransform();// Transform to world space
+  FVector locationRelativeToVehicle = vehicleSpace.InverseTransformPosition(theObject->GetActorLocation());
+#+end_src
+
+e.g. Transform from vehicle space into world space
+
+#+begin_src cpp
+  FTransform vehicleSpace = vehicle->GetActorTransform();
+  FVector wheelLocationInWorld = vehicleSpace.TransformPosition(relativeWheelPosition);
+#+end_src
+
+** Matrices
+
+=FMatrix=
+
+Unlikely to use them much these days, use =FTransform= instead, 30% faster than =FTransform= to transform a *lot* of vectors
+
+But is good for creating an orientation from a given direction vector and nominal up vector
+
+#+begin_src cpp
+  void GetRightUpVectors(const FVector& forward, FVector& right, FVector& up)
+  {
+      right = FVector::CrossProduct(up, forward);
+      right.Normalize();
+
+      up = FVector::CrossProduct(forward, right);
+  }
+
+  FQuat GetQuaternionFromForwardUp(const FVector& forword, FVector up)
+  {
+      FVector right = FVector::ZeroVector;
+
+      GetRightUpVectors(forward, right, up);
+
+      FMatrix matrix = FMatrix(forward, right, up, FVector::ZeroVector);
+
+      return FQuat(matrix);
+  }
+#+end_src
+
+=InverseTransformPosition= and =InverseTransformVector= using =FMatrix= is *slow*, invert matrix yourself
+
+#+begin_src cpp
+  FMatrix invMatrix = matrix.Inverse();
+
+  localPosition = invMatrix.TransformPosition(position);
+#+end_src
+
+=InverseTransformPosition= and =InverseTransformVector= using =FTransform= has no performance penalty
+
+Whereas =FTransform= refers to Translation, =FMatrix= refers to Origin
+
+* Data
+
+** CDO
+
+** ConstructHelper
+
+** Data Table
+
+*** DataTable
+
+*** CompositeDataTable
+
+** Data Asset
+
+*** DataAsset
+
+*** PrimaryDataAsset
+
+** Curve Table
+
+** Settings(ini)
+
+** Console Variables
+
+** Data Registry
+
+* Asset Management (Loading)
+
+** pak dlc chunk
+
+* Multiplayer
+** Peer-to-Peer
+** Client-Server
+Unreal Engine uses authoritative client-server model
+*** Listen-server
+*** Dedicated-server
+** Online Subsystem
+connect with each other without knowing IP address
+** cmd
+
++ Open map as a listen server
+
+  Open [map]?listen
+
++ Connect
+
+  Connect 127.0.0.1
+
+* Net
+
+=NetMode=
+
+=NetDriver=
+=NetConnection=
+=Channel=
+
+** Authority & Role
+
+#+begin_src cpp
+  enum ENetRole
+  {
+      ROLE_None,            // HasAuthority() => false
+      ROLE_SimulatedProxy,  // HasAuthority() => false
+      ROLE_AutonomousProxy, // HasAuthority() => false
+      ROLE_Authority,       // HasAuthority() => true
+      ROLE_MAX,
+  }
+#+end_src
+
++ =ROLE_Authority= :: Replicated object on the server (almost all), or non-replicated object on client.
++ =ROLE_SimulatedProxy= :: Replicated object controlled by value _replicated from server_.
++ =ROLE_AutonomousProxy= :: Replicated object relies on a client uploading values to the server (some values can still be server authoritative) to be replicated for other clients to simulate.
+
+#+begin_src cpp
+  if (HasAuthority())
+  {
+      // This GameInstance is NM_Standalone
+      // -OR- it's NM_DedicatedServer/NM_ListenServer
+      // -OR- it's NM_Client and this actor was spawned on server
+  }
+  else
+  {
+      // This GameInstance is NM_Client and this actor was spawned on server
+  }
+#+end_src
+
++ APawn
+
+  #+begin_src cpp
+    IsLocallyControlled();
+  #+end_src
+
++ APlayerController
+
+  #+begin_src cpp
+    IsLocalController();
+    Cast<ULocalPlayer>(Player);
+  #+end_src
+
++ Assertion
+
+  #+begin_src cpp
+    checkf(HasAuthority(), TEXT("This code should only run on the server!"));
+    checkf(!HasAuthority(), TEXT("This code should only run on the client!"));
+    checkf(IsLocallyControlled(), TEXT("Pawn must be locally controlled!"));
+  #+end_src
+
+** Property Replication
+
+eventually
+
+*** header
+
+#+begin_src cpp
+  UPROPERTY(Replicated)
+  int32 ActorProperty;
+
+  UPROPERTY(ReplicatedUsing=OnRep_RunCodeWhenUpdatedProp)
+  int32 RunCodeWhenUpdatedProp;
+
+Private:
+
+  UFUNCTION() void OnRep_RunCodeWhenUpdatedProp();
+#+end_src
+
+*** cpp
+
+#+begin_src cpp
+  #include "Net/UnrealNetwork.h"
+
+  // Specify which properties should be replicated, and under what conditionsr
+  void AMyActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+  {
+      Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+      // replicated to all clients at all times
+      DOREPLIFETIME(ThisClass, ActorProperty);
+
+      DOREPLIFETIME_CONDITION(ThisClass, ActorProperty, COND_OwnerOnly);// COND_SkipOwner, COND_InitialOnly...
+  }
+
+  Void AMyActor::Foo()
+  {
+      // Changing value on the server wili not automatically invoke the RepNotify function on server in C++
+      if (HasAuthority())
+      {
+          RunCodeWhenUpdatedProp = 42;
+          OnRep_RunCodeWhenUpdatedProp();// Manually call the RepNotify function
+      }
+  }
+#+end_src
+
+** RPCs (Remote Procedure Calls)
+
+immediate, reserved for high-priority, time-critical network code
+
+#+begin_src cpp
+  UFUNCTION(Client)
+  void Client_Foo();
+
+  UFUNCTION(Server)
+  voud Server_Foo();
+
+  UFUNCTION(NetMulticast)
+  void Multicast_Foo();
+
+  UFUNCTION(Reliable, Client) // Reliable RPC guaranteed to arrive and in order within a single actor
+  void Client_DoSomethingImportant();
+
+  UFUNCTION(Unreliable, Client) // Unreliable RPC can be dropped if bandwidth is saturared
+  void Client_DoSomethingNonEssential();
+
+  UFUNCTION(Unreliable, Server, WithValidation)
+  void Server_DoSomething();
+  void Server_DoSomething_Implementation();
+  bool Server_DoSomething_Validate();
+#+end_src
+
+_Implementation
+_Validate
+
+** GameFramework
+
+| Class             | Replication                    |
+|-------------------+--------------------------------|
+| AGameModeBase     | Server-only                    |
+| AGameStateBase    | Replicated to all clients      |
+| AGameSession      | Server-only                    |
+| APlayerController | Replicated to owning client    |
+| APlayerState      | Replicated to all clients      |
+| APawn             | Replicated to relevant clients |
+| AActor            | You decide!                    |
+
+** Actor Virtual Functions
+
+*** APawn
+
+| =NM_Standalone=                          | =NM_DedicatedServer=                     | =NM_Client=                              |
+|----------------------------------------+----------------------------------------+----------------------------------------|
+| =void PostInitProperties()=              | =void PostInitProperties()=              | =void PostInitProperties()=              |
+| =void PreRegisterAllComponents()=        | =void PreRegisterAllComponents()=        | =void PreRegisterAllComponents()=        |
+| =void PostRegisterAllComponents()=       | =void PostRegisterAllComponents()=       | =void PostRegisterAllComponents()=       |
+| =void OnConstruction(const FTransform&)= | =void OnConstruction(const FTransform&)= | =void OnConstruction(const FTransform&)= |
+| =void PreInitializeComponents()=         | =void PreInitializeComponents()=         | =void PreInitializeComponents()=         |
+| =void PostInitializeComponents()=        | =void PostInitializeComponents()=        | =void PostInitializeComponents()=        |
+| =void BeginPlay()=                       | =void BeginPlay()=                       | =void BeginPlay()=                       |
+|----------------------------------------+----------------------------------------+----------------------------------------|
+| =float TakeDamage(float, ...)=           | =float TakeDamage(float, ...)=           |                                        |
+| =void PossessedBy(AController*)=         | =void PossessedBy(AController*)=         |                                        |
+| =void UnPossessed()=                     | =void UnPossessed()=                     |                                        |
+|----------------------------------------+----------------------------------------+----------------------------------------|
+| =void PawnClientRestart()=               |                                        | =void PawnClientRestart()=               |
+| =void Restart()=                         |                                        | =void Restart()=                         |
+|----------------------------------------+----------------------------------------+----------------------------------------|
+|                                        |                                        | =void PreNetReceive()=                   |
+|                                        |                                        | =void PostNetReceive()=                  |
+|                                        |                                        | =void PostNetInit()=                     |
+|                                        |                                        | =void OnRep_Controller()=                |
+|                                        |                                        | =void OnRep_PlayerState()=               |
+
+** Fast TArray Replication
+
++ Engine\Source\Runtime\Net\Core\Classes\Net\Serialization\FastArraySerializer.h
+
+Fast TArray Replication is a custom implementation of NetDeltaSerialize that is suitable for TArrays of UStructs. It offers performance improvements for large data sets, it serializes removals from anywhere in the array optimally, and allows events to be called on clients for adds and removals. The downside is that you will need to have game code mark items in the array as dirty, and well as the *order* of the list is not guaranteed to be identical between client and server in all cases.
+
+*** Step 1: Make your struct inherit from =FFastArraySerializerItem=
+
+#+begin_src cpp
+  USTRUCT()
+  struct FExampleItemEntry : public FFastArraySerializerItem
+  {
+      GENERATED_USTRUCT_BODY()
+
+      // Your data:
+      UPROPERTY()
+      int32 ExampleIntProperty;
+
+      UPROPERTY()
+      float ExampleFloatProperty;
+
+      /**
+       * Optional functions you can implement for client side notification of changes to items;
+       * Parameter type can match the type passed as the 2nd template parameter in associated call to FastArrayDeltaSerialize
+       *
+       * NOTE: It is not safe to modify the contents of the array serializer within these functions, nor to rely on the contents of the array
+       * being entirely up-to-date as these functions are called on items individually as they are updated, and so may be called in the middle of a mass update.
+       */
+      void PreReplicatedRemove(const struct FExampleArray& InArraySerializer);
+      void PostReplicatedAdd(const struct FExampleArray& InArraySerializer);
+      void PostReplicatedChange(const struct FExampleArray& InArraySerializer);
+
+      // Optional: debug string used with LogNetFastTArray logging
+      FString GetDebugString();
+
+  };
+#+end_src
+
+*** Step 2: You MUST wrap your TArray in another struct that inherits from =FFastArraySerializer=
+
+#+begin_src cpp
+  USTRUCT()
+  struct FExampleArray: public FFastArraySerializer
+  {
+      GENERATED_USTRUCT_BODY()
+
+      UPROPERTY()
+      TArray<FExampleItemEntry> Items; /** Step 3: You MUST have a TArray named Items of the struct you made in step 1. */
+
+      /** Step 4: Copy this, replace example with your names */
+      bool NetDeltaSerialize(FNetDeltaSerializeInfo & DeltaParms)
+      {
+          return FFastArraySerializer::FastArrayDeltaSerialize<FExampleItemEntry, FExampleArray>( Items, DeltaParms, *this );
+      }
+  };
+
+  /** Step 5: Copy and paste this struct trait, replacing FExampleArray with your Step 2 struct. */
+  template<>
+  struct TStructOpsTypeTraits< FExampleArray > : public TStructOpsTypeTraitsBase2< FExampleArray >
+  {
+      enum
+      {
+          WithNetDeltaSerializer = true,
+      };
+  };
+#+end_src
+
+*** Step 6 and beyond
+
+- Declare a UPROPERTY of your FExampleArray (step 2) type.
+
+- You MUST call MarkItemDirty on the FExampleArray when you change an item in the array. You pass in a reference to the item you dirtied.
+
+  See =FFastArraySerializer::MarkItemDirty=.
+
+- You MUST call MarkArrayDirty on the FExampleArray if you remove something from the array.
+
+- In your classes GetLifetimeReplicatedProps, use DOREPLIFETIME(ThisClass, YourArrayStructPropertyName);
+
+  You can provide the following functions in your structure (step 1) to get notifies before add/deletes/removes:
+
+  #+begin_src
+    void PreReplicatedRemove(const FFastArraySerializer& Serializer)
+    void PostReplicatedAdd(const FFastArraySerializer& Serializer)
+    void PostReplicatedChange(const FFastArraySerializer& Serializer)
+    void PostReplicatedReceive(const FFastArraySerializer::FPostReplicatedReceiveParameters& Parameters)
+  #+end_src
+
+That's it!
+
+** Replication Graph
+
+The Replication Graph Plugin is a system for network replication in multiplayer games that is designed to scale well with large numbers of players and replicated Actors.
+
+** Push Model
+
+Engine\Source\Runtime\Net\Core\Public\Net\Core\PushModel\PushModel.h
+
+*** Unreal Engine 4. New network model: PushModel
+
+#+BEGIN_QUOTE
+In the standard Unreal Engine network architecture, the server checks if the value of the replicated Actor class variable has changed, and in case of a difference, the value is synchronized between the server and the client. When the amount of data to sync is small, there are no particular performance issues.
+
+However, a game can often consist of a huge set of Actors and variables that need to be replicated to one or more clients, and this can already become a problem area.
+
+UE already provides features like: NetUpdateFrequency, NetCullDistanceSquared, etc. The main task of which is to eliminate from the general replication picture as many actors as possible who do not need to constantly synchronize data.
+
+PushModel is, for now, an experimental feature that can allow developers to actively mark the need to synchronize a property, several macros are provided for this:
+#+END_QUOTE
+#+begin_src cpp
+  // These macros set a specific variable to mark the need for synchronization, and the server, in turn, removes the need to constantly check for changes in value.
+  #define MARK_PROPERTY_DIRTY(Object, Property)
+  #define MARK_PROPERTY_DIRTY_STATIC_ARRAY_INDEX(Object, RepIndex, ArrayIndex)
+  #define MARK_PROPERTY_DIRTY_STATIC_ARRAY(Object, RepIndex, ArrayIndex)
+
+  #define MARK_PROPERTY_DIRTY_FROM_NAME(ClassName, PropertyName, Object)
+  #define MARK_PROPERTY_DIRTY_FROM_NAME_STATIC_ARRAY_INDEX(ClassName, PropertyName, ArrayIndex, Object)
+  #define MARK_PROPERTY_DIRTY_FROM_NAME_STATIC_ARRAY(ClassName, PropertyName, ArrayIndex, Object)
+#+end_src
+
+**** How to set up PushModel
+
++ First of all, in Build.cs, you need to add to exclude compilation problems
+
+#+begin_src csharp
+  PublicDependencyModuleNames.AddRange(new string[]  {"NetCore"});
+#+end_src
+
++ Secondly, mark the necessary variables =UPROPERTY(Replicated)= or =(ReplicatedUsing)=, =GetLifetimeReplicatedProps=, =DOREPLIFETIME_WITH_PARAMS=, =DOREPLIFETIME_WITH_PARAMS_FAST=, =DOREPLIFETIME=, =DOREPLIFETIME_CONDITION=.
+
+#+begin_src cpp
+  void ASomeActor::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
+  {
+      Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+      FDoRepLifetimeParams SharedParams;
+      SharedParams.bIsPushBased = true;
+
+      SharedParams.Condition = COND_OwnerOnly;
+      DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, SomeVar, SharedParams);
+
+      SharedParams.Condition = COND_InitialOnly;
+      DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PlayerId, SharedParams);
+      DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, bIsABot, SharedParams);
+  }
+#+end_src
+
+#+begin_src cpp
+  void ASomeActor::SetSomeVar(const float SomeValue)
+  {
+      MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, SomeVar, this);
+      SomeVar = SomeValue;
+  }
+#+end_src
+
+Detailed usage examples can be found in the APlayerState class in the engine.
+
++ About =FDoRepLifetimeParams=
+
+#+begin_src cpp
+  /**
+   * Struct containing various parameters that can be passed to DOREPLIFETIME_WITH_PARAMS to control
+   * how variables are replicated.
+   */
+  struct ENGINE_API FDoRepLifetimeParams
+  {
+    /** Replication Condition. The property will only be replicated to connections where this condition is met. */
+    ELifetimeCondition Condition = COND_None;
+
+    /**
+     * RepNotify Condition. The property will only trigger a RepNotify if this condition is met, and has been
+     * properly set up to handle RepNotifies.
+     */
+    ELifetimeRepNotifyCondition RepNotifyCondition = REPNOTIFY_OnChanged;
+
+    /** Whether or not this property uses Push Model. See PushModel.h */
+    bool bIsPushBased = false;
+  };
+#+end_src
+
+** Iris Replication
+
+* *Unreal Engine Reflection System*
+
+** =UPROPERTY=
+
+It's part of a reflection system engineered into Unreal Engine
+
+- edit a data member in the Editor
+- access a data member in blueprint script
+- serialize a data member into blueprint or level instance
+- synchronize a data member in multiplayer games
+- data member is a pointer to a *UObject* of some form
+
+*** Specifiers
+
+basic three aspects
+
+**** visibility or editability
+
+all mutually exclusive
+
+| specifiers          | description                                                                      |
+|---------------------+----------------------------------------------------------------------------------|
+| EditAnywhere        | property can be edited on archetypes and instances                               |
+| EditDefaultsOnly    | property can be edited only on archetypes, not on instances                      |
+| EditInstanceOnly    | property can be edited only on instances, not on archetypes                      |
+| VisibleAnywhere     | property is visible, but cannot be edited                                        |
+| VisibleDefaultsOnly | property is only visible for archetypes, not for instances, and cannot be edited |
+| VisibleInstanceOnly | property is only visible for instances, not for archetypes, and cannot be edited |
+
+In the real world, either *no specifier*, *VisibleAnywhere* or *EditAnywhere*, other specifiers are very uncommon
+
++ An oddity
+  for any property pointers like mesh component, the visible specifiers seem to function the same way with edit specifiers.
+
+**** accessibility from blueprint script
+
+| specifiers         | description                                          |
+|--------------------+------------------------------------------------------|
+| BlueprintReadOnly  | property can be read by blueprints, but not modified |
+| BlueprintReadWrite | property can be read or written from a blueprint     |
+
++ easier for maintenance
+  Try to limit access to properties to blueprint script as much as possible
+
+**** category to which belongs
+
+completely free-form text value to group properties
+
+**** Transient
+
+UPROPERTY(Transient)
+
+Any pointer to a class derived *UObject* needs to be a *UPROPERTY*, but never accessed by blueprint or editor any way
+
+this means that it's a temporary property, and the engine should just look after clearing it up
+some are generated at run-time though, and don't require editing, serialization etc.
+
+Just so the Unreal Engine knows about, and can manage them via a smart point system
+
+** =UFUNCTION=
+
+*** Specifiers
+
+- =BlueprintCallable= :: function can be executed in a Blueprint
+- =BlueprintPure= :: function doesn't have any side effects (a lot like a const function), great for function just return information without really doing anything
+
+- =BlueprintImplementableEvent= :: function declared in c++, but only implemented in blueprint, check if the return value is valid when call in c++
+- =BlueprintNativeEvent= :: declared in c++, implemented in c++, and possibly blueprint, the c++ function =Foo_Implementation= will only be called if blueprint implementation doesn't exist
+
+- =Exec= :: The function can be executed from the in-game console. Exec commands only function when declared within *certain Classes*.
+
+** =UCLASS=
+
+*** =StaticClass()=
+
+Returns a pointer of UCLASS type (UObject), referring to a particular class
+
+** Class References =TSubclassOf=
+
+** Get Blueprint References
+
+Try to *avoid* this
+
+*** Header
+
+#+begin_src cpp
+  private:
+      TSubClassOf<AParentClass> ChildBP;
+#+end_src
+
+=TSubClassOf= holding a class id (UE reflection system), an unique identifier for the class, neither reference nor instance of the class
+
+*** Construct Function
+
+#+begin_src cpp
+  static ConstructorHelpers::FClassFinder<AParentClass> ChildBPClassFinder(
+      TEXT("Blueprint'/Game/Path/to/ChildBP.ChildBP_C'")//Replaced .uasset with .BPNAME_C, "Content" with "Game"
+  );
+
+  ChildBP = ChildBPClassFinder.Class;
+#+end_src
+
+Now =ChildBP= is the Type of the Blueprint
+
+*** Function
+
+#+begin_src cpp
+  AParentClass* Parent = nullptr;
+
+  Parent = Pawn->FindParentClass(ChildBP);
+  if (Parent != nullptr)
+  {
+  }
+#+end_src
+
+* UnrealBuildTool & UnrealHeaderTool
+
+** UnrealBuildTool
+
++ NMake build system
+
+** Inline Generated Cpp
+
+This improves compile times because less header parsing is required.
+
+*** Usage (in cpp file)
+
+#+begin_src cpp
+  #include UE_INLINE_GENERATED_CPP_BY_NAME(FileName)
+#+end_src
+
+*** Definition
+
+#+begin_src cpp
+  // Used to inline generated cpp files from UObject headers
+  #define UE_INLINE_STRINGIFY(name) #name
+  #if UE_DISABLE_INLINE_GEN_CPP
+      #define UE_INLINE_GENERATED_CPP_BY_NAME(name) UE_INLINE_STRINGIFY(CoreTypes.h)
+  #else
+      #define UE_INLINE_GENERATED_CPP_BY_NAME(name) UE_INLINE_STRINGIFY(name.gen.cpp)
+  #endif
+#+end_src
+
+So =#include UE_INLINE_GENERATED_CPP_BY_NAME(FileName)= is actually =#include "FileName.gen.cpp"=
+
+It simply includes the equivalent generated cpp file into the current cpp - which doesn't affect anything functional but means that the generated cpp will be part of the same translation unit (a single unit of compilation, usually one cpp file and everything it includes, or a bunch of cpp files when dealing with unity build).
+
+* Modules & Plugins
+
+** Module
+
+A distinct unit of C++ code, contains a build file
+
+Code only (no assets)
+
+** Plugin
+
+Collection of code and data
+
+Made up of one or more modules
+
+** Dependencies
+
+#+begin_src dot :file ./images/module_plugin_dependencies.png
+digraph Dependencies {
+    graph[dpi=300, fontname="Fira Code", bgcolor="#030c36", label="Dependencies", fontsize=16, fontcolor=white, rankdir=LR];
+    node [shape=box, style=filled];
+    edge [style=bold, color=red];
+    node0 [label="Engine Module",color=lightblue];
+    node1 [label="Engine Module",color=lightblue];
+    node2 [label="Engine Plugin",color=lightyellow];
+    node3 [label="Engine Plugin",color=lightyellow];
+    node4 [label="Game Plugin",color=lightyellow];
+    node5 [label="Game Plugin",color=lightyellow];
+    node6 [label="Game Module",color=lightblue];
+    node7 [label="Game Module",color=lightblue];
+
+    subgraph cluster_0 {
+        color=lightgrey;
+        node0 -> node1;
+        label="Engine";
+    }
+
+    subgraph cluster_1 {
+        color=lightgrey;
+        node2 -> node3;
+        label="Independent";
+    }
+
+    subgraph cluster_2 {
+        color=lightgrey;
+        node4 -> node5;
+        node6 -> node7 ;
+        node6 -> node4 [constraint=false];
+        label="Project Specific";
+    }
+
+    node2 -> node0 [constraint=false];
+    node4 -> node2;
+}
+#+end_src
+
+#+RESULTS:
+[[file:./images/module_plugin_dependencies.png]]
+
+** Add custom UObject to content browser
+
+*** uplugin
+
+#+begin_src csharp
+  "Modules": [
+      {
+          "Name": "MyModule",
+          "Type": "Runtime",
+          "LoadingPhase": "PreDefault"
+      },
+      {
+          "Name": "MyModuleEditor",
+          "Type": "Editor",
+          "LoadingPhase": "Default"
+      }
+  ]
+#+end_src
+
+*** Create UObject In =Runtime= or =Editor= Module
+
+#+begin_src cpp
+#include "Runtime/Engine/Classes/Engine/DataAsset.h"
+
+UCLASS(ClassGroup = MyClassGroup, Category = "MyCategory", BlueprintType, Blueprintable)
+class MYMODULE_API UMyItemsDatabase : public UDataAsset
+{
+    GENERATED_BODY()
+
+};
+#+end_src
+
+*** Add dependency In =Editor= Module
+
+**** build.cs
+
+#+begin_src
+            PrivateDependencyModuleNames.AddRange(
+                new string[] {
+                    "Core",
+                    "CoreUObject",
+                    "Slate",
+                    "SlateCore",
+                    "UnrealEd",
+                    "AssetTools",// for addition AssetTypeActions
+                }
+            );
+#+end_src
+
+**** Add Factory of the UObject (module header)
+
+#+begin_src cpp
+  #pragma once
+
+  #include "CoreMinimal.h"
+  #include "Factories/Factory.h"
+  #include "MyModuleEditorModule.generated.h"
+
+  // Asset factories
+
+  UCLASS()
+  class MYMODULEEDITOR_API UMyItemsDatabase_Factory : public UFactory
+  {
+      GENERATED_UCLASS_BODY()
+
+  public:
+      virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+
+  protected:
+      virtual bool IsMacroFactory() const { return false; }
+  };
+
+  UCLASS()
+  class MYMODULEEDITOR_API UOtherObject_Factory : public UFactory
+  {
+      GENERATED_UCLASS_BODY()
+
+  public:
+      virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+
+  protected:
+      virtual bool IsMacroFactory() const { return false; }
+  };
+#+end_src
+
+**** module cpp
+
+#+begin_src cpp
+  #include "MyModuleEditorModule.h"
+  #include "MyItemsDatabase.h"
+
+  class FMyModuleEditorModule : public IModuleInterface
+  {
+      // ...
+  }
+
+  IMPLEMENT_MODULE(FMyModuleEditorrModule, MyModuleEditor)
+
+  // Asset factories
+
+  // MyItemsDatabase
+  UMyItemsDatabase_Factory::UMyItemsDatabase_Factory(const class FObjectInitializer &OBJ) : Super(OBJ)
+  {
+      SupportedClass = UMyItemsDatabase::StaticClass();
+      bEditAfterNew = true;
+      bCreateNew = true;
+  }
+
+  UObject* UMyItemsDatabase_Factory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+  {
+      check(Class->IsChildOf(UMyItemsDatabase::StaticClass()));
+      return NewObject<UMyItemsDatabase>(InParent, Class, Name, Flags | RF_Transactional, Context);
+  }
+#+end_src
+
+Now we can create the object from editor menu (in Miscellaneous category), but not support filter yet.
+
+**** Create new AssetTypeActions (in module cpp or other file)
+
+#+begin_src cpp
+  class FMyModuleEditorModule : public IModuleInterface
+  {
+  public:
+      // IModuleInterface interface
+      virtual void StartupModule() override;
+      virtual void ShutdownModule() override;
+      // End IModuleInterface interface
+
+      static EAssetTypeCategories::Type GetMyAssetsCategory() { return MyAssetsCategory; }
+
+  private:
+      void RegisterAssetTypeActions(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)
+      {
+          AssetTools.RegisterAssetTypeActions(Action);
+          CreatedAssetTypeActions.Add(Action);
+      }
+
+      TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
+
+      static EAssetTypeCategories::Type MyAssetCategory;
+  }
+
+  EAssetTypeCategories::Type FMyModuleEditorModule::MyAssetCategory;
+
+  IMPLEMENT_MODULE(FMyModuleEditorrModule, MyModuleEditor)
+#+end_src
+
+#+begin_src cpp
+  #include "MyModuleEditorModule.h"
+  #include "AssetTypeActions_Base.h"
+  #include "AssetTypeActions/AssetTypeActions_DataAsset.h"
+  #include "MyItemsDatabase.h"
+
+  #define LOCTEXT_NAMESPACE "MyModuleEditor"
+
+  // Asset type actions
+
+  class FAssetTypeActions_MyItemsDatabase : public FAssetTypeActions_Base
+  {
+  public:
+      virtual FText GetName() const override { return LOCTEXT("MyDataAsset", "My Items Data Asset"); }
+      virtual uint32 GetCategories() override { return FMyModuleEditorModule::GetMyAssetsCategory(); }
+      virtual FColor GetTypeColor() const override { return FColor(127, 255, 255); }
+      virtual FText GetAssetDescription(const FAssetData &AssetData) const override { return LOCTEXT("MyDataAssetDesc", "My DataAsset description."); }
+      virtual UClass* GetSupportedClass() const override { return UMyItemsDatabase::StaticClass(); }
+  };
+
+  class FAssetTypeActions_MyDataAsset : public FAssetTypeActions_DataAsset
+  {
+  public:
+      virtual FText GetName() const override { return NSLOCTEXT("AssetTypeActions", "AssetTypeActions_MyDataAsset", "My Data Asset"); }
+      virtual uint32 GetCategories() override { return FTaggedInputEditorModule::GetMyAssetsCategory(); }
+      virtual FColor GetTypeColor() const override { return FColor(127, 255, 255); }
+      virtual FText GetAssetDescription(const FAssetData& AssetData) const override { return NSLOCTEXT("AssetTypeActions", "AssetTypeActions_MyDataAssetDesc", "My DataAsset description."); }
+      virtual UClass* GetSupportedClass() const override { return UMyDataAsset::StaticClass(); }
+  };
+
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+**** Register in =StartupModule()=
+
+#+begin_src cpp
+  void FMyModuleEditorModule::StartupModule()
+  {
+      // Register asset types
+      IAssetTools &AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+      // Register category
+      MyAssetCategory = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("MyCustomCategory")), LOCTEXT("MyCustomCategory", "MyCustomCategory"));
+      // Register asset type actions
+      {
+          RegisterAssetTypeActions(AssetTools, MakeShareable(new FAssetTypeActions_MyItemsDatabase));
+      }
+  }
+#+end_src
+
+**** Unregister in =ShutdownModule()=
+
+#+begin_src cpp
+  void FMyModuleEditorModule::StartupModule()
+  {
+      // Unregister asset type actions
+      if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
+      {
+          IAssetTools& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
+        for (auto& AssetTypeAction : CreatedAssetTypeActions)
+        {
+            if (AssetTypeAction.IsValid())
+            {
+                AssetToolsModule.UnregisterAssetTypeActions(AssetTypeAction.ToSharedRef());
+            }
+        }
+      }
+      CreatedAssetTypeActions.Empty();
+  }
+#+end_src
+
+** Creating assets with support of a custom class picker
+
+*** MyAssetFactory.h
+
+#+begin_src cpp
+  #pragma once
+
+  #include "CoreMinimal.h"
+  #include "Templates/SubclassOf.h"
+  #include "Factories/Factory.h"
+  #include "ClassViewerModule.h"
+  #include "ClassViewerFilter.h"
+  #include "MyAssetFactory.generated.h"
+
+  UCLASS(HideCategories=Object, MinimalAPI)
+  class UMyAssetFactory : public UFactory
+  {
+      GENERATED_UCLASS_BODY()
+
+  public:
+
+      // The parent class of the created blueprint
+      UPROPERTY(EditAnywhere, Category = UMyAssetFactory)
+      TSubclassOf<class UMyAsset> ParentClass;
+
+      //~ Begin UFactory Interface
+      virtual bool ConfigureProperties() override;
+      virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+      //~ Begin UFactory Interface
+  };
+
+  class FMyAssetClassFilter : public IClassViewerFilter
+  {
+  public:
+      TSet<const UClass*> AllowedChildrenOfClasses;
+      EClassFlags DisallowedClassFlags;
+
+      virtual bool IsClassAllowed(const FClassViewerInitializationOptions& InInitOptions, const UClass* InClass, TSharedRef<class FClassViewerFilterFuncs> InFilterFuncs) override
+      {
+           return !InClass->HasAnyClassFlags(DisallowedClassFlags) && InFilterFuncs->IfInChildOfClassesSet(AllowedChildrenOfClasses, InClass) != EFilterReturn::Failed;
+      }
+
+      virtual bool IsUnloadedClassAllowed(const FClassViewerInitializationOptions& InInitOptions, const TSharedRef<const IUnloadedBlueprintData> InUnloadedClassData, TSharedRef<FClassViewerFilterFuncs> InFilterFuncs) override
+      {
+           return !InUnloadedClassData->HasAnyClassFlags(DisallowedClassFlags) && InFilterFuncs->IfInChildOfClassesSet(AllowedChildrenOfClasses, InUnloadedClassData) != EFilterReturn::Failed;
+      }
+  };
+#+end_src
+
+*** MyAssetFactory.cpp
+
+#+begin_src cpp
+  #include "MyAssetFactory.h"
+  #include "UnrealEd.h"
+  #include "ClassViewerModule.h"
+  #include "ClassViewerFilter.h"
+  #include "Kismet2/SClassPickerDialog.h"
+  #include "MyAsset.h"
+
+  #define LOCTEXT_NAMESPACE "UMyAssetFactory"
+
+  UMyAssetFactory::UMyAssetFactory(const FObjectInitializer& ObjectInitializer)
+      : Super(ObjectInitializer)
+  {
+      bCreateNew = true;
+      bEditAfterNew = true;
+      SupportedClass = UMyAsset::StaticClass();
+  }
+
+  bool UMyAssetFactory::ConfigureProperties()
+  {
+      // nullptr the ParentClass so we can check for selection
+      ParentClass = nullptr;
+
+      // Load the classviewer module to display a class picker
+      FClassViewerModule& ClassViewerModule = FModuleManager::LoadModuleChecked<FClassViewerModule>("ClassViewer");
+
+      FClassViewerInitializationOptions Options;
+      Options.Mode = EClassViewerMode::ClassPicker;
+
+      TSharedPtr<FGearModClassFilter> Filter = MakeShareable(new FGearModClassFilter);
+      Filter->AllowedChildrenOfClasses.Add(UGearMod::StaticClass());
+      // Prevent selecting Abstract, Deprecated classes
+      Filter->DisallowedClassFlags = CLASS_Abstract | CLASS_Deprecated;
+
+      // Options.ClassFilters;
+      Options.ClassFilter = Filter;//deprecated
+
+      const FText TitleText = LOCTEXT("CreateMyAssetOptions", "Pick My Asset Class");
+      UClass* ChosenClass = nullptr;
+      const bool bPressedOk = SClassPickerDialog::PickClass(TitleText, Options, ChosenClass, UMyAsset::StaticClass());
+
+      if (bPressedOk)
+      {
+          ParentClass = ChosenClass;
+      }
+
+      return bPressedOk;
+  };
+
+  UObject* UMyAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+  {
+        if (ParentClass != nullptr)
+        {
+             return NewObject<UMyAsset>(InParent, ParentClass, Name, Flags | RF_Transactional);
+        }
+        else
+        {
+             check(Class->IsChildOf(UMyAsset::StaticClass()));
+             return NewObject<UMyAsset>(InParent, Class, Name, Flags | RF_Transactional);
+        }
+  }
+
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+* *Unreal Build System*
+
+** Unreal Header Tool (UHT)
+
+*** Reflection
+
+include "Actor.generated.h"
+Macro
+
+** Unreal Build Tool (UBT)
+
+** Build Configuration
+
+* *Scripting And Automation*
+
+** Editor Widgets
+
+Build own tools
+
+** Python
+
+*** Setup
+
+Enable "Python Editor Script Plugin"
+
+*** Usage
+
++ cmd open new line
+  Shift + Enter
++ Access Asset Property
+  #+begin_src python
+    import unreal
+
+    your_asset = unreal.load_asset('/Refrence/path/to/assrt')
+    prop = your_asset.get_editor_property("property_name")
+    print prop
+    prop = your_asset.set_editor_property("property_name", value)
+  #+end_src
+  - Use Get/Set Method
+    access property not exposed to blueprint but editor
+    there is a post-change hook to rebuild asset
++ Script Path
+  #+begin_src python
+    import sys
+    for path in sys.path:
+        print path
+
+    import os
+    os.makedirs("UE/Engine/Content/Python")
+    os.startfile("UE/Engine/Content/Python")
+  #+end_src
++ =init_unreal.py=
+
+* Editor Utility Widget
+
+* Rendering
+
+** Cel Shading
+
+*** Material
+
+*** Post Process
+
+**** PPCelShader
+
++ Turn off Unreal Tone mapping
+  + (deprecated) r.TonemapperFilm 0
+    DefaultEngine.ini
+    [/Script/Engine.RendererSettings]
+    r.TonemapperFilm 0
+  + PostProcessVolume->Detail->Color Grading->Misc->Expand Gamut->0
+  + PostProcessVolume->Detail->Color Grading->Misc->Tone Curve Amount->0
+
+*** Idol Master
+
+**** Tone Mapper Setting
+
+***** Post Process
+
+r.TonemapperFilm 1
+ToneCurveAmount 0
+
+***** ini Config
+
+#+begin_src ini
+  [/Script/Engine.RendererSettings]
+#+end_src
+
+* *Performance and Profiling*
+
+Early and often, but only optimize after profiling shows problems.
+
+** Profiling in a Build
+
+*** Minimize the noise
+
++ Turn off everything not using
++ Turn off v-sync
+  r.vsync 0
+
+*** Turn off Framerate Smoothing
+
+Project Settings > General Settings > Framerate group
+
+*** Make a Test Build
+
+* *Gameplay Features*
+
+** Cover System
+
+** Aim Assist
+
++ Slow down when Reticle near target
+
++ Tracking Reticle when player "attempt" to aim to target
+
+* Localization
++ FText :: For End User, localization
+
+* Console (Cmd)
+
+** Command
+
+- =stat unit= :: draw basic performance stats
+- =ShowFlag.MeshEdges 1= :: render wireframe
+
+** Declare Command
+
+e.g. Project.cpp (global)
+
+#+begin_src cpp
+  static void OurGameCommand(const TArray<FString>& args, UWorld* world, FOutputDevice& ar)
+  {
+      // Do something.
+  }
+
+  static FAutoConsoleCommand CConsoleCommand1(
+      TEXT("OurGame.Command1"),
+      TEXT("Performs no function just yet."),
+      FConsoleCommandWithWorldArgsAndOutputDeviceDelegate::CreateStatic(OurGameCommand1), ECVF_Default);
+#+end_src
+
+e.g. cheat
+
++ in Game module cpp
+
+#+begin_src cpp
+#include "HAL/IConsoleManager.h"
+
+/**
+Demo console variable for extra force controlling player ball bearings.
+*********************************************************************************/
+
+static TAutoConsoleVariable<int32> CVarExtraMagnetism(
+    TEXT("OurGame.ExtraMagnetism"),
+    0,// Default value to this ConsoleVariable
+    TEXT("Defines whether we should cheat in getting our bearings into their goals.\n")
+    TEXT("  0: no extra magnetism\n")
+    TEXT("  1: extra magnetism\n"),
+    ECVF_Scalability | ECVF_RenderThreadSafe);
+#+end_src
+
++ in Class function
+
+#+begin_src cpp
+    // If we're cheating then give our goals extra magnetism.
+
+    static const IConsoleVariable* extraForce = IConsoleManager::Get().FindConsoleVariable(TEXT("OurGame.ExtraMagnetism"));// Static variable initialize only once, good for runtime performance
+
+    if (extraForce != nullptr &&
+        extraForce->GetInt() != 0)
+    {
+        magnetism *= 4.0f;
+    }
+#+end_src
+
+e.g. GameMode.h
+
+#+begin_src cpp
+  UFUNCTION(Exec)
+  void MyTestFunction()
+  {
+      // Do something.
+  }
+#+end_src
+
+** Set default value in config file
+
++ DefaultEngine.ini
+
+  #+begin_src ini
+    [SystemSettings]
+    OurGame.ExtraMagnetism=1
+  #+end_src
+
+* *Tips and Tricks*
+
+** Unreal Project Structure
+
+- Binaries(gitignore) :: compile output
+- Config :: config files
+- Content :: game asset and blueprints
+- DerivedDataCache(gitignore) :: platform specified optimized asset
+- Intermediate(gitignore) :: temporary files
+  - Intermediate files for Build(.obj, precompiled header)
+  - .generate.h/.cpp file generated by UHT prepossessing
+  - VS.vcxproj file, Shader compiled via .uproject
+  - AssetRegistryCache, cache for Asset Registry system, an index for asset
+- Saved(gitignore) :: for save, log, info files
+- Source :: source code
+
+** *Pitfall*
+
+*** Asset Conditional Pipeline
+
+Mesh imported to UE will be *Triangulate*
+
+** Blueprint
+
+*** debug
+
++ Collision visibility
+Details -> Rendering -> Hidden in Game
++ Trace visibility
+  Draw debug type
++ Vector Variable
+  Details -> Variable -> Instance Editable & Show 3D Widget
+
+*** keep wire nice and tight when Event is far way from Bind Event node
+
+#+ATTR_HTML: width="380px"
+#+ATTR_ORG: :width 380
+[[./images/event_dispatchers_wire_management.png]]
+
+*** Collapse (select nodes then right click)
+
++ Collapse Nodes
++ Collapse to Function
+  when external objects need to call
++ Collapse to Macro
+
+*** ray-cast channel
+
+Details panel -> Collision -> change Collision Preset to "Custom" -> Ignore all response then select what you need
+
+*** frame delay
+
+It is used to initialize/load some variables/objects/references that has not been initialized in this frame. Sometimes in UE4 objects need to go the 2nd or 3rd iteration to get fully loaded. Sometimes you need to get much longer delays to make sure that it is all loaded.
+
+- Double frame delay
+  ->Delay(Duration 0)->Delay(Duration 0)->
+
+** Scale something to 0 hide it
+
+** *Procedural Animation*
+
+** Vertex Shader or Skeletal Mesh
+
+#+begin_comment
+Vertex Shader may improve performance, but it cannot affect physics.
+
+A couple of notes and caveats on this:
+Vertex shaders do not update mesh normals, so this only works for translation. This is also not an adequate workflow for animators if you are doing interacting reloads.
+There is a lot of optimizations you can make on skeletal meshes to reduce the cost.
+Static mesh bounds, update rate optimizations, visibility tick and manual ticking (not ticking the weapon when is not moving), as well as lod settings inside anim graphs can help a lot to bring the cost down. GPU skinning if you are not already using it makes skeletal meshes way more efficient.
+
+This is still an important technique to keep in mind.
+
+You can also get rotations and manually adjust normals. For anything more complex than a transform or rotation as seem here you can use Vertex Animation Textures, and can bake the per frame vertex positions and normals into an image. But yeah, just another tool in the box.
+
+Would it make sense to have a relatively simple skeletal mesh with static meshes attached to it, like they did with the ancient in the valley of the ancients demo? Or are you still losing performance due to there being a skeletal mesh?
+
+In some cases it might be, like the ancient. It had so many polygons that it probably would've been impossible to do real time with a skeletal mesh. However, multiple static meshes are usually going to incur multiple draw calls.
+I think it could go either way.
+#+end_comment
+
+** Outlines
+
+"Real-Time Rendering"
+
+*** Shading Normal Contour Edges
+
+*** Procedural Geometry Silhouetting
+
+*** Edge Detection by Image Processing
+
+*** Geometric Contour Edge Detection
+
+** Lighting Techniques & Guides
+
+** Anti-Ghosting with Temporal Anti-Aliasing (TAA)
+
+Project Settings->Engine - Rendering->Optimizations->Check "Output velocities due to vertex deformation"
+
++ Uncheck "Output velocities during base pass" before toggle that
++ This incurs a performance cost and can be quite significant if many object are using World Position Offset
+
+** Tweak for Temporal Anti-Aliasing (TAA)
+
+r.TemporalAACurrentFrameWeight 0.2
+r.TemporalAASample 4
+r.Tonemapper.Sharpen 0.5
+
+** Boobs Physics, NPR Hair/Cloth Physics, Chain, Slime, Jelly
+
+bouncy and squishy
+
+*** Soft Body
+
+*** AnimDynamics
+
+*** Physics Constraints
+
+*** Niagara Iterative Constraints
+
+*** Kawaii Physics
+
+*** Physics Driven Bones
+
+** Build and Run from Command-Line
+
+On Windows
+
+*** Build
+
++ Editor
+#+begin_src shell
+  "Path/to/Engine/Build/Batchfiles/Build.bat" GameName(ProjectEditor) PlatformName(Win64) ConfigurationName(Development) "Path/to/Project/Project.uproject" -waitmutex -NoHotReload
+#+end_src
++ Cooked Content
+#+begin_src shell
+  "Path/to/Engine/Build/Batchfiles/Build.bat" GameName(Project) PlatformName(Win64) ConfigurationName(Development) "Path/to/Project/Project.uproject" -waitmutex -NoHotReload
+#+end_src
+
+*** Run
+
++ Editor
+#+begin_src shell
+  "Path/to/Engine/Binaries/Win64/UnrealEditor.exe" "Path/to/Project/Project.uproject" -log
+#+end_src
++ Standalone
+#+begin_src shell
+  "Path/to/Engine/Binaries/Win64/UnrealEditor.exe" "Path/to/Project/Project.uproject" -game -log -windowed -resx=1280 -resy=720
+#+end_src
+#+begin_src shell
+  "Path/to/Project/Binaries/Win64/Project.exe" -game -log -windowed -resx=1280 -resy=720
+#+end_src
+
+*** Batch Script
+
+Put these batch files together with the project folder
+
++ vars.bat
+#+begin_src bat
+  @echo off
+
+  REM The %~dp0 specifier resolves to the path to the directory where this .bat is located in.
+  REM The :~0,-1% will strip the trailing slash from that path
+  set ROOTDIR=%~dp0
+  set ROOTDIR=%ROOTDIR:~0,-1%
+
+  set PROJECT=ProjectName
+  set PROJECT_DIR=%ROOTDIR%\%PROJECT%
+  set UPROJECT_PATH=%PROJECT_DIR%\%PROJECT%.uproject
+
+  set UE_DIR=C:\Program Files\Epic Games\UE_5.0EA
+  set UEEDITOR_EXE=%UE_DIR%\Engine\Binaries\Win64\UnrealEditor.exe
+  set BUILD_BAT=%UE_DIR%\Engine\Build\Batchfiles\Build.bat
+#+end_src
++ build.bat
+#+begin_src bat
+  @echo off
+
+  call %~dp0\vars.bat
+
+  call "%BUILD_BAT%" %PROJECT%Editor Win64 Development "%UPROJECT_PATH%" -waitmutex -NoHotReload
+#+end_src
++ editor.bat
+#+begin_src bat
+  @echo off
+
+  call %~dp0\vars.bat
+
+  start "" "%UEEDITOR_EXE%" "%UPROJECT_PATH%" %*
+#+end_src
++ Use
+#+begin_src shell
+  build && editor -log
+#+end_src
+
+* Style Guide
+
+** Asset Naming Convention
+
+=Prefix_BaseAssetName_Variant_Suffix=
+
+*** Asset Prefix
+
+| Texture            | T_   |
+| Material           | M_   |
+| MaterialInstance   | MI_  |
+| MaterialFunction   | MF_  |
+| MaterialLayer      | ML_  |
+| StaticMesh         | SM_  |
+| SkeletonMesh       | SKM_ |
+| Skeleton           | SK_  |
+| PhysicsAsset       | PA_  |
+| Blueprint          | BP_  |
+| BlueprintInterface | BPI_ |
+| InputAction        | IA_  |
+| InputMapping       | IM_  |
+| UI                 | UI_  |
+| NiagaraEmiiter     | NE_  |
+
+*** Suffix
+
+| AnimBP     | _AnimBP  |
+| Montage    | _Montage |
+| ControlRig | _CtrlRig |
+
+** Editor Type Color
+
+| Type        | FColor                |
+|-------------+-----------------------|
+| Blueprint   | FColor(63, 126, 255)  |
+| InputAction | FColor(127, 255, 255) |
+| DataAsset   | FColor(201, 29, 85)   |
+| DataTable   | FColor(62, 140, 35)   |
+| AnimBP      | FColor(200, 116, 0)   |
+|             |                       |
+
+* Some Plugins
+
+** Gameplay Message Router
+
+A subsystem that allows registering for and sending messages between unconnected gameplay objects.
+
+*** Update UI without cast to character
+
+* Blender
+
+** Blender Tools
+
+[[https://github.com/EpicGames/BlenderTools]]
+
+*** Send to Unreal
+
+**** Setup
+
++ Install the add on in Blender and activate it
++ Enable _Editor Scripting Utilities_ and _Python Editor Script Plugin_ Plugin
++ Go to Edit > Project Settings, search for 'python' and then enable remote execution
++ (Option) Go to Edit > Editor Preferences, search for 'CPU',  then under Editor Performance disable _Use Less CPU when in Background_.
+  That way unreal continues to update even when it is not the active application. Now the Blender and Unreal UI will update at the same time and you will see your changes update without having to click on Unreal.
+
+*** UE to Rigify
+
+**** Setup
+
++ Make sure that the _Rigify_ addon is active.
++ Install the add on in Blender and activate it
+
+** Export FBX
+
++ Path Mode :: Copy (check Embed Textures)
++ Geometry > Smoothing :: Edge (to avoid warnings)
++ Armature :: uncheck Add Leaf Bones
+
+** Bone Orientation
+
+Unreal work with joint, but blender work with bones (a bone with start joint and the end leaf joint, leaf joint ignored in unreal engine)
+
+Select bones > Clear Parent (Alt+P) > Disconnect Bone > Rotate bones by individual origins
+
+* Org-mode settings
+
+#  LocalWords:  vsync LookUp cpp ACharacter AddressSanitizer ini num
+#  LocalWords:  PPCelShader TonemapperFilm RendererSettings UWorld IM
+#  LocalWords:  DefaultEngine PostProcessVolume NavMesh SpawnActor MF
+#  LocalWords:  SceneComponents EnhancedInputComponent InputMapping
+#  LocalWords:  EnhancedPlayerInput ProjectSettings InputAction BPI
+#  LocalWords:  BlueprintInterface MaterialInstance UInputAction IK
+#  LocalWords:  UInputMappingContext CtrlRig AnimBP SkeletonMesh cmd
+#  LocalWords:  EnhancedInput InputCore AnimInstance UAnimInstance UE
+#  LocalWords:  Effector Metasounds Nanite NaniteMeshes ShowFlags EQS
+#  LocalWords:  getters AnimationBP MeshProjection DebugMode ShowFlag
+#  LocalWords:  DrawOnlyVSMInvalidatingGeo InstanceLevelCollision UBI
+#  LocalWords:  AncientGame GameFeatures GameFeatureData AssetManager
+#  LocalWords:  UEngineSubSystem UGameFeaturesSubsystem GameFeature
+#  LocalWords:  PrimaryAssetType UGameFeaturesProjectPolicies Shader
+#  LocalWords:  GameSpecificPolicies GetGameMode MeshComponents UEnum
+#  LocalWords:  UDefaultGameFeaturesProjectPolicies BeginPlay Rigify
+#  LocalWords:  UGameFeaturesSubsystemSettings CreateDefaultSubobject
+#  LocalWords:  PostInitializeComponents PreInitializeComponents SKM
+#  LocalWords:  TickComponent showdebug Cinematics SmartObject UBT UI
+#  LocalWords:  NMake LocalWords UnrealBuildTool UnrealHeaderTool RPC
+#  LocalWords:  VisibleAnywhere EditInstanceOnly EditDefaultsOnly UMG
+#  LocalWords:  GameplayCue OwnerActor ActorComponents AnimDynamics
+#  LocalWords:  MyGameVersion GameplayEffect FSubsystemCollectionBase
+#  LocalWords:  EditorSubsystem UDynamicSubsystem GameInstance AInfo
+#  LocalWords:  FWorldContext AActor UPrimitiveComponent UObject UX
+#  LocalWords:  Ragdoll RawInput DualShock config Rotators rotator
+#  LocalWords:  wireframe Async Viewports Viewmodel TAA Gameplay ECS
+#  LocalWords:  Viasfora IntelliSense MVVM
