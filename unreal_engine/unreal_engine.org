@@ -482,13 +482,94 @@ Regular =Tick()= function will not be called per sub-step, it called per game fr
 
 * Cinematics with Sequencer
 
-* Metasounds and Quartz
+* Audio
 
-** Metasounds
+** Unreal Audio Engine
 
-** Quarts
+*** Sound Cues, Sound Classes, Sound Mixes
+
+*** Spatializer Plugin
+
+**** Google Resonance Audio
+
+**** Simple Interaural Time Delay (ITD)
+
+*** Sound Attenuation
+
+*** Occlusion Plugin
+
+*** Submixes
+
+*** Reverb Plugin
+
+*** Convolution Reverb
+
+*** Modulation Plugin
+
+*** Audio Volumes
+
+*** MetaSounds and Quartz
+
+**** Metasounds
+
+**** Quarts
 
 combine sound and gameplay
+
+** Microsoft Project Acoustics
+
+Back accurate acoustics for 3D scenes using wave acoustics engine.
+
++ lightweight runtime
++ Designer controls
++ Azure or local baking
++ Offerings Unreal Audio & Unreal/Wwise
+
+#+ATTR_HTML: width="500px"
+#+ATTR_ORG: :width 500
+[[file:./images/Microsoft_ProjectAcoustics_BigPicture.png]]
+
+*** Project Triton (Top 5 sound propagation effects)
+
++ Obstruction :: Sound is weakened when it diffracts around obstructions​.
+
+[[file:./images/ProjectTriton_Obstruction_12.3.1-1024x487.png]]
+
+#+ATTR_HTML: width="300px"
+#+ATTR_ORG: :width 300
+[[file:./images/microsoft_project_acoustics_obstruction_demonstration.webp]]
+
++ Portaling (sound redirection) :: Sound heard “through the wall” (red) from source direction is incorrect​. Doors redirect sounds, which is more believable​.
+
+[[file:./images/ProjectTriton_Portaling_12.3-1024x487.png]]
+
++ Occlusion :: Occlusion is total reduction in loudness from geometry, involving complex propagation and diffraction (diffracted paths in green)​.
+
+[[file:./images/ProjectTriton_Web_Occlusion_2400x1141-1024x487.png]]
+
+#+ATTR_HTML: width="300px"
+#+ATTR_ORG: :width 300
+[[file:./images/microsoft_project_acoustics_portaling_occlusion_demonstration.webp]]
+
++ Reverberance :: Left: Close to the source, direct path (green) is loud compared to reflections (orange), resulting in high clarity and low reverberance. Right: Behind the partition, direct path is weakened from diffraction, causing low clarity and high reverberance, conveying that the source is in a different room.​
+
+[[file:./images/ProjectTriton_Reverberance_12.3.3-1024x487.png]]
+
+#+ATTR_HTML: width="300px"
+#+ATTR_ORG: :width 300
+[[file:./images/microsoft_project_acoustics_reverberance_demonstration.webp]]
+
++ Decay time :: Larger rooms reverberate longer.​
+
+[[file:./images/ProjectTriton_Web_DecayTime_2400x1141-1024x487.png]]
+
+#+ATTR_HTML: width="300px"
+#+ATTR_ORG: :width 300
+[[file:./images/microsoft_project_acoustics_decaytime_demonstration.webp]]
+
+*** Acoustics
+
+*** Source Data Override Interface
 
 * Post Process
 
@@ -533,7 +614,7 @@ cast ray or volume
 + eg. Event graph on Sender
 #+ATTR_HTML: width="1000px"
 #+ATTR_ORG: :width 1000
-[[./images/blueprint_interface_sender.png]]
+[[file:./images/blueprint_interface_sender.png]]
 
 **** Implement the Interface
 
@@ -553,7 +634,7 @@ cast ray or volume
 + only work on sub-level is (always) streamed in
 #+ATTR_HTML: width="600px"
 #+ATTR_ORG: :width 600
-[[./images/blueprint_interface_level_comm.png]]
+[[file:./images/blueprint_interface_level_comm.png]]
 
 ** *Event Dispatchers*
 
@@ -577,7 +658,7 @@ cast ray or volume
 
 #+ATTR_HTML: width="400px"
 #+ATTR_ORG: :width 400
-[[./images/event_dispatchers_unbind_on_destroyed.png]]
+[[file:./images/event_dispatchers_unbind_on_destroyed.png]]
 
 *** C++ equivalent
 
@@ -1164,7 +1245,7 @@ An Actor with CameraComponent that can be placed in a level.
 
 #+ATTR_HTML: width="900px"
 #+ATTR_ORG: :width 900
-[[./images/camera_responsibility_chain.png]]
+[[file:./images/camera_responsibility_chain.png]]
 
 *** Point of View update sequence
 
@@ -1245,7 +1326,7 @@ E.g. cave interiors
 + "memory" where it stores the information it needs to behave
 #+ATTR_HTML: width="900px"
 #+ATTR_ORG: :width 900
-[[./images/pawns_and_controller_relationship.png]]
+[[file:./images/pawns_and_controller_relationship.png]]
 
 *** Behavior Trees
 
@@ -1255,7 +1336,7 @@ describe switching between a finite set of tasks
 
 #+ATTR_HTML: width="500px"
 #+ATTR_ORG: :width 500
-[[./images/behavior_tree_execution_flow.png]]
+[[file:./images/behavior_tree_execution_flow.png]]
 
 **** Composites
 
@@ -1423,7 +1504,7 @@ showdebug EnhancedInput
 
 #+ATTR_HTML: width="600px"
 #+ATTR_ORG: :width 600
-[[./images/enhanced_input_trigger.png]]
+[[file:./images/enhanced_input_trigger.png]]
 
 **** Trigger State
 
@@ -1496,11 +1577,11 @@ showdebug EnhancedInput
 
     #+ATTR_HTML: width="400px"
     #+ATTR_ORG: :width 400
-    [[./images/dualshock4_rawinput_dpad.png]]
+    [[file:./images/dualshock4_rawinput_dpad.png]]
 
     #+ATTR_HTML: width="700px"
     #+ATTR_ORG: :width 700
-    [[./images/dualshock4_rawinput_dpad_macro.png]]
+    [[file:./images/dualshock4_rawinput_dpad_macro.png]]
 
     Copy this to Blueprint
 
@@ -2282,7 +2363,7 @@ and implement the function like this (this is a hard override of the default Gam
   #pragma endregion TagRelationship //}
 #+end_src
 
-* Gameplay Interaction(Plugin)
+* Gameplay Interaction (Plugin)
 
 * *Modular Game Features*
 
@@ -2363,7 +2444,7 @@ Load *All* GameFeatures
 
 * Data layer
 
-* *Code Programming*
+* *Programming*
 
 ** C++ Required
 
@@ -2601,7 +2682,7 @@ References are _non-const_ are always *output* parameters, use =UPARAM(ref)= to 
 
 #+ATTR_HTML: width="500px"
 #+ATTR_ORG: :width 500
-[[./images/ufunction_input_output_parameters.png]]
+[[file:./images/ufunction_input_output_parameters.png]]
 
 *** Multi Execs Pin
 
@@ -3027,7 +3108,6 @@ So, for objects where being Null is a valid state (like anything that can be gar
   if(!Ptr) return;
 #+end_src
 
-
 ** C++ *and* Blueprint
 
 No separate "Scripting API"
@@ -3158,7 +3238,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 #+ATTR_HTML: width="900px"
 #+ATTR_ORG: :width 900
-[[./images/movement_input_blueprint.png]]
+[[file:./images/movement_input_blueprint.png]]
 
 **** Turn and LookUp
 
@@ -3277,10 +3357,10 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 #+ATTR_HTML: width="420px"
 #+ATTR_ORG: :width 420
-[[./images/mouse_input_blueprint.png]]
+[[file:./images/mouse_input_blueprint.png]]
 #+ATTR_HTML: width="700px"
 #+ATTR_ORG: :width 700
-[[./images/gamepad_input_blueprint.png]]
+[[file:./images/gamepad_input_blueprint.png]]
 
 *** Trace
 
@@ -3357,7 +3437,7 @@ void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* Other
 
 #+ATTR_HTML: width="900px"
 #+ATTR_ORG: :width 900
-[[./images/timeline_implement_blueprint.png]]
+[[file:./images/timeline_implement_blueprint.png]]
 
 **** C++
 
@@ -3449,7 +3529,7 @@ public:
 
 #+ATTR_HTML: width="1000px"
 #+ATTR_ORG: :width 1000
-[[./images/character_death_ragdoll.png]]
+[[file:./images/character_death_ragdoll.png]]
 
 **** C++
 
@@ -3555,7 +3635,7 @@ An easing function for a linear ratio (ease In and Out)
 
 #+ATTR_HTML: width="200px"
 #+ATTR_ORG: :width 200
-[[./images/trigonometry_easing_ratio_func.png]]
+[[file:./images/trigonometry_easing_ratio_func.png]]
 
 Can make noise from =Sine= (oscillator)
 
@@ -3638,7 +3718,7 @@ e.g. Bilinear filter
 
 #+ATTR_HTML: width="200px"
 #+ATTR_ORG: :width 200
-[[./images/lerp_bilinear_filtering_color.png]]
+[[file:./images/lerp_bilinear_filtering_color.png]]
 
 #+begin_src cpp
   FVector3 GetColor(const FVector2& coordinate, const FBitmap& bitmap)
@@ -5038,6 +5118,10 @@ Project Settings > General Settings > Framerate group
 
 *** Make a Test Build
 
+** Task System
+
+** TaskGraph
+
 * *Gameplay Features*
 
 ** Cover System
@@ -5164,7 +5248,7 @@ Details -> Rendering -> Hidden in Game
 
 #+ATTR_HTML: width="380px"
 #+ATTR_ORG: :width 380
-[[./images/event_dispatchers_wire_management.png]]
+[[file:./images/event_dispatchers_wire_management.png]]
 
 *** Collapse (select nodes then right click)
 
