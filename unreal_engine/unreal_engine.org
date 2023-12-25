@@ -139,6 +139,14 @@ custom background
 
 * Material
 
+** Texture
+
+*** Texture Compression Format
+
+BC(DXT) oodle
+
+ASTC
+
 ** World Offset
 
 leafs and grass
@@ -175,6 +183,10 @@ Opacity masks
 ShowFlag.DrawOnlyVSMInvalidatingGeo 1
 
 * Skeleton
+
+** Import Options
+
+- Use T0 as Ref Pose :: won't print warning if skeleton is different from Unreal Engine usually expect
 
 ** Skeleton Mesh
 
@@ -249,6 +261,18 @@ Attach actors to invisible animated skeleton
 
 ** Notifies
 
+*** AnimNotify
+
+override function =Received_Notify=
+
+*** AnimNotifyState
+
+override function =Received_NotifyBegin= =Received_NotifyEnd= =Received_NotifyTick=
+
++ Hold =Shift= to edit with animation playing
+
+use MeshComp->GetOwner to get actor, or use interface
+
 ** Movement drive Animation VS. Animation drive Movement
 
 ** *Animation Blueprint*
@@ -264,6 +288,36 @@ Attach actors to invisible animated skeleton
 *** Slot(Animation Blueprint)
 
 Play Montage
+
+** Sync Group & Sync Marker
+
+*** e.g. for leg consistence
+
+- Without Sync
+
+  [[file:./images/animation_transition_without_sync_group.webp]]
+
+- With Sync
+
+  [[file:./images/animation_transition_with_sync_group.webp]]
+
+*** Setup
+
+**** Group-Based Syncing (Match the the length of two blend anim)
+
+- Set the same Sync Group name on animBP nodes
+
+- Set Sync Method to Sync Group
+
+**** Sync Markers (Match relevant position of markers)
+
+- Mark animations with Sync Markers
+
+  Notify > Add Sync Marker
+
+- Set the same Sync Group name on animBP nodes
+
+- Set Sync Method to Sync Group
 
 ** Pose Snapshot
 
@@ -1123,6 +1177,24 @@ Default multi-player implement
 
 + automatically instantiate
 + life cycle manager
++ use *soft reference* for asset to prevent initial loading stall
+
+*** Initialize Dependence (for same level subsystems)
+
+Call =InitializeDependency()= from =FSubsystemCollectionBase=.
+
+#+begin_src cpp
+void UMySubsystem1::Initialize(FSubsystemCollectionBase& Collection)
+{
+    // Initialize UMySubsystem2 first if not initialized
+    Collection.InitializeDependency(UMySubsystem2::StaticClass());
+
+    auto _MySubsystem2 = GetGameInstance()->GetSubsystem<UMySubsystem2>();
+    if(_MySubsystem2){
+        // Processing UMySubsystem2
+    }
+}
+#+end_src
 
 *** =USubsystem= : UObject
 
@@ -1131,6 +1203,8 @@ Default multi-player implement
 *** =UWorldSubsystem= : USubsystem
 
 *** =ULocalPlayerSubsystem= : USubsystem
+
+Due to =UCLASS(Within = LocalPlayer)=, =ULocalPlayerSubsystem= cannot be accessed outside local player (e.g. dedicated servers have no local player), access via PlayerController.
 
 *** =UDynamicSubsystem= : USubsystem
 
@@ -1318,6 +1392,8 @@ E.g. cave interiors
 * =UObject=
 * *AI*
 
+** Behavior Tree
+
 *** "body-soul-brain" pattern
 
 + "body" is the visual representation of the character
@@ -1374,22 +1450,23 @@ accomplished with the *AI Perception Component* gathers registered *Stimuli Sour
 
 NavMesh
 
-* MASS AI
 
-** SmartObject
+** Mass Framework
+
+*** SmartObject
 
 Interaction
 
-*** Setup
+**** Setup
 
 + Enable Plugin
   SmartObject
   GameplayBehaviorSmartObject
   AI Behaviors
 
-** State Tree
+*** State Tree
 
-** Zone Graph
+*** ZoneGraph
 
 * Environment Query System (EQS)
 
@@ -1559,6 +1636,14 @@ showdebug EnhancedInput
 
 + Chorded :: Applies a chord action that must be triggering for this trigger's action to trigger
 
+*** InputAction
+
+instanced per player
+
+*** Keybindings
+
+=FEnhancedActionKeyMapping=
+
 ** Support for =DUALSHOCK®4= on Windows via RawInput plugin
 
 + Enable "Windows RawInput" plugin
@@ -1590,7 +1675,7 @@ showdebug EnhancedInput
 
     #+end_src
 
-* GameplayTags
+* Gameplay Tags
 
 ** Native Gameplay Tags
 
@@ -1598,7 +1683,6 @@ showdebug EnhancedInput
 
 + .h
   #+begin_src cpp
-    #include "CoreMinimal.h"
     #include "NativeGameplayTags.h"
 
     //if you want to export the tag
@@ -1609,11 +1693,150 @@ showdebug EnhancedInput
 
   #+begin_src cpp
     UE_DEFINE_GAMEPLAY_TAG(MYTAG, "MyTag")
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(MYTAG, "MyTag", "Comment here.")
   #+end_src
 
 ** Adding and using Gameplay Tags in C++
 
 [[https://www.thegames.dev/?p=78][Adding and using Gameplay Tags in C++]]
+
+** IGameplayTagAssetInterface
+
+Interface for assets which contain gameplay tags.
+
+*** Tags on AbilitySystemComponent
+
+**** header
+
+#+begin_src cpp
+  #include "GameplayTagAssetInterface.h"
+
+  struct FGameplayTag;
+  struct FGameplayTagContainer;
+
+  class AMyActor : /*...*/, public IGameplayTagAssetInterface
+  {
+      // ...
+
+  public:
+
+      //~IGameplayTagAssetInterface interface
+      virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+      virtual bool HasMatchingGameplayTag(FGameplayTag TagToCheck) const override;
+      virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const override;
+      virtual bool HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const override;
+      //~End of IGameplayTagAssetInterface interface
+
+  }
+#+end_src
+
+**** cpp
+
+#+begin_src cpp
+  void AMyActor::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+  {
+      if (const UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+      {
+          ASC->GetOwnedGameplayTags(TagContainer);
+      }
+  }
+
+  bool AMyActor::HasMatchingGameplayTag(FGameplayTag TagToCheck) const
+  {
+      if (const UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+      {
+          return ASC->HasMatchingGameplayTag(TagToCheck);
+      }
+
+      return false;
+  }
+
+  bool AMyActor::HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const
+  {
+      if (const UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+      {
+          return ASC->HasAllMatchingGameplayTags(TagContainer);
+      }
+
+      return false;
+  }
+
+  bool AMyActor::HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const
+  {
+      if (const UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+      {
+          return ASC->HasAnyMatchingGameplayTags(TagContainer);
+      }
+
+      return false;
+  }
+#+end_src
+
+*** Tags on object self
+
+**** header
+
+#+begin_src cpp
+  #include "GameplayTagAssetInterface.h"
+  #include "GameplayTagContainer.h"
+
+  class UMyObject : /*...*/, public IGameplayTagAssetInterface
+  {
+      // ...
+
+  public:
+
+      //~IGameplayTagAssetInterface
+      virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+      //~End of IGameplayTagAssetInterface
+
+  protected:
+
+      // Gameplay-related tags associated with this object
+      UPROPERTY(EditAnywhere, BlueprintReadOnly)
+      FGameplayTagContainer StaticGameplayTags;
+  }
+#+end_src
+
+**** cpp
+
+#+begin_src cpp
+  void UMyObject::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+  {
+      TagContainer.AppendTags(StaticGameplayTags);
+  }
+#+end_src
+
+* *State Tree* - /General purpose hierarchical state machine/
+
+** execution flow
+
+*** initialize
+
+- TreeStart (Evaluator)
+- Tick to ensure output valid (Evaluator)
+- =SelectState= (root)
+  - Eval (evaluate =EnterCondition= until leaf)
+  - Apply (call =EnterState= from tasks _root to leaf_)
+
+*** Runtime tick
+
+- Tick (Evaluator)
+- Tick (tick Tasks left to right in each state from _root to leaf_)
+  - Stop ticking sub Tasks if any Task succeeded/failed(completed)
+  - call =StateComplete= for all tasks (even not ticked) of _activated states_ from _leaf to root_
+  - Transition
+    - test conditions of Transition from _leaf to root_
+    - call =ExitState= of tasks from _leaf to root_
+    - =SelectState= (transition target state)
+- test tick transition condition
+  - test tick transition condition for all activated states
+  - call =ExitState= of tasks from _leaf to root_
+  - =SelectState= (transition target state)
+
+** Transition
+
+- Gate Delay :: additional delay before transition happen
 
 * *Gameplay Abilities System (GAS)*
 
@@ -2365,23 +2588,222 @@ and implement the function like this (this is a hard override of the default Gam
 
 * Gameplay Interaction (Plugin)
 
-* *Modular Game Features*
+* *Modular Gameplay Features*
 
-** Setup
+** Modular Gameplay
+
+*** GameFrameworkComponentManager (Game Instance Subsystem)
+
+**** Initialization State System (InitState)
+
+This system provides registration and notification functions that make _synchronizing the initialization of components on an Actor_ coordination simpler.
+
+=UGameFrameworkInitStateInterface=
+
+***** Terminology
+
+| Term           | Description                                                                                                                                                          |
+|----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| InitState      | User-defined global =GameplayTags= for tracking the initialization and general life cycle of different features (usually implemented by components) attached to Actor. |
+| (Actor)Feature | Unique =FName= identifier in Implementer object (often a component), which has InitState.                                                                    |
+| StateChain     | Linearly arranged InitStates, (usually static) const TArray<FGameplayTag>.                                                                                           |
+
+***** Lyra
+
+****** StateChain (Defined in =CheckDefaultInitialization()=)
+
+- Spawned (=LyraGameplayTags::InitState_Spawned=) :: The feature has finished spawning and initial replication, which is only set in =BeginPlay=.
+- DataAvailable (=LyraGameplayTags::InitState_DataAvailable=) :: All data needed by the feature has been replicated or loaded, including dependencies on other actors that may also need to be replicated.
+- DataInitialized (=LyraGameplayTags::InitState_DataInitialized=) :: After all of the data becomes available, it is used to complete other initialization actions like adding gameplay abilities.
+- GameplayReady (=LyraGameplayTags::InitState_GameplayReady=) :: The object has finished all initialization and is ready to be interacted with in normal gameplay.
+
+****** PawnExtension
+
+******* =BeginPlay=
+
+=BindOnActorInitStateChanged(NAME_None, ...)= listen for InitState changes of all the other features
+
+****** HeroComponent
+
+******* =BeginPlay=
+
+=BindOnActorInitStateChanged()= listen for =PawnExtension= changes init state
+
+=TryToChangeInitState()= notifies done spawning (change InitState to =InitState_Spawned=)
+
+***** Implementation
+
+****** =RegisterInitStateFeature()=
+
+Registers with the system but does not set a state, this is useful to call from component =OnRegister=.
+
+#+begin_src cpp
+  void UMyComponent::OnRegister()
+  {
+      Super::OnRegister();
+
+      // ...
+      // May add some assert and log here
+
+      // Register with the init state system early, this will only work if this is a game world
+      RegisterInitStateFeature();
+  }
+#+end_src
+
+****** =UnregisterInitStateFeature()=
+
+This should generally be called from EndPlay to unregister from the system and unbind notification delegates.
+
+#+begin_src cpp
+  void UMyComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+  {
+      // ...
+
+      UnregisterInitStateFeature();
+
+      Super::EndPlay(EndPlayReason);
+  }
+#+end_src
+
+****** =CanChangeInitState() const=
+
+Implement checks to see if the required data is available.
+
+#+begin_src cpp
+  bool ULyraPawnExtComponent::CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const
+  {
+      check(Manager);
+
+      APawn* Pawn = GetPawn<APawn>();
+      if (!CurrentState.IsValid() && DesiredState == LyraGameplayTags::InitState_Spawned)
+      {
+          // As long as we are on a valid pawn, we count as spawned
+          if (Pawn)
+          {
+              return true;
+          }
+      }
+      if (CurrentState == LyraGameplayTags::InitState_Spawned && DesiredState == LyraGameplayTags::InitState_DataAvailable)
+      {
+          // Pawn data is required.
+          if (!PawnData)
+          {
+              return false;
+          }
+
+          const bool bHasAuthority = Pawn->HasAuthority();
+          const bool bIsLocallyControlled = Pawn->IsLocallyControlled();
+
+          if (bHasAuthority || bIsLocallyControlled)
+          {
+              // Check for being possessed by a controller.
+              if (!GetController<AController>())
+              {
+                  return false;
+              }
+          }
+
+          return true;
+      }
+      else if (CurrentState == LyraGameplayTags::InitState_DataAvailable && DesiredState == LyraGameplayTags::InitState_DataInitialized)
+      {
+          // Transition to initialize if all features have their data available
+          return Manager->HaveAllFeaturesReachedInitState(Pawn, LyraGameplayTags::InitState_DataAvailable);
+      }
+      else if (CurrentState == LyraGameplayTags::InitState_DataInitialized && DesiredState == LyraGameplayTags::InitState_GameplayReady)
+      {
+          return true;
+      }
+
+      return false;
+  }
+#+end_src
+
+****** =HandleChangeInitState()=
+
+Overridden to perform any object-specific changes that should occur on a specific state transition.
+
+#+begin_src cpp
+  void UMyComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState)
+  {
+      if (CurrentState == MyGameplayTags::InitState_Foo && DesiredState == MyGameplayTags::InitState_Bar)
+      {
+          // ...do something when state changes
+      }
+  }
+#+end_src
+
+****** =CheckDefaultInitialization()=
+
+Try and progress the default initialization path, likely using =ContinueInitStateChain(StateChain)=.
+
+#+begin_src cpp
+  void ULyraPawnExtensionComponent::CheckDefaultInitialization()
+  {
+      // Before checking our progress, try progressing any other features we might depend on (set by BindOnActorInitStateChanged)
+      CheckDefaultInitializationForImplementers();
+
+      static const TArray<FGameplayTag> StateChain = { LyraGameplayTags::InitState_Spawned, LyraGameplayTags::InitState_DataAvailable, LyraGameplayTags::InitState_DataInitialized, LyraGameplayTags::InitState_GameplayReady };
+
+      // This will try to progress from spawned (which is only set in BeginPlay) through the data initialization stages until it gets to gameplay ready
+      ContinueInitStateChain(StateChain);
+  }
+#+end_src
+
+****** =BindOnActorInitStateChanged()= & =OnActorInitStateChanged()=
+
+Can be used on the interface to quickly listen for changes made to other features on the _same Actor_.
+
+This can then be used to call functions like =CheckDefaultInitialization= that may advance the init state of the feature.
+
+#+begin_src cpp
+  void ULyraHeroComponent::BeginPlay()
+  {
+      Super::BeginPlay();
+
+      // Listen for changes to all features
+      //BindOnActorInitStateChanged(NAME_None, FGameplayTag(), false);
+
+      // Listen for when the pawn extension component changes init state
+      BindOnActorInitStateChanged(ULyraPawnExtensionComponent::NAME_ActorFeatureName, FGameplayTag(), false);
+
+      // Notifies state manager that we have spawned, then try rest of default initialization
+      ensure(TryToChangeInitState(LyraGameplayTags::InitState_Spawned));
+      CheckDefaultInitialization();
+  }
+#+end_src
+
+#+begin_src cpp
+  void ULyraHeroComponent::OnActorInitStateChanged(const FActorInitStateChangedParams& Params)
+  {
+      if (Params.FeatureName == ULyraPawnExtensionComponent::NAME_ActorFeatureName)
+      {
+          if (Params.FeatureState == LyraGameplayTags::InitState_DataInitialized)
+          {
+              // If the extension component says all all other components are initialized, try to progress to next state
+              CheckDefaultInitialization();
+          }
+      }
+  }
+#+end_src
+
+** Game Features
+
+*** Setup
 
 Enable _Game Features_ and _Modular Gameplay_ plugin
 
 + Game Features :: Support for Game Feature and Actions
 + Modular Gameplay :: For add component
 
-*** Create Game Feature
+**** Create Game Feature
 
 New Plugin -> Game Feature
 - Path :: Path/to/Project/Plugins/GameFeatures/
 - Content Browser
   check "Show Plugin Content"
 
-*** GameFeatureData Asset
+**** GameFeatureData Asset
 
 *Do NOT rename it*
 
@@ -2389,25 +2811,25 @@ defined behavior and Actions
 
 check ProjectSettings/AssetManager->PrimaryAssetType->Load GameFeatureData
 
-*** Actions
+**** Actions
 
-*** =UGameFeaturesSubsystem= :: UEngineSubSystem
+**** =UGameFeaturesSubsystem= :: UEngineSubSystem
 
-**** UGameFeaturesProjectPolicies
+***** UGameFeaturesProjectPolicies
 
 Defined which GameFeatures should be load
 
-***** UDefaultGameFeaturesProjectPolicies
+****** UDefaultGameFeaturesProjectPolicies
 
 Load *All* GameFeatures
 
-***** Create GameSpecificPolicies
+****** Create GameSpecificPolicies
 
 #+begin_src cpp
   GameSpecificPolicies = NewObject<UGameFeaturesProjectPolicies>(this, singletonClass);
 #+end_src
 
-***** Setup MyGameFeaturesProjectPolicies
+****** Setup MyGameFeaturesProjectPolicies
 
 - .uplugin file
   Define a Key(Metadata)
@@ -2436,9 +2858,9 @@ Load *All* GameFeatures
   }
   #+end_src
 
-**** UGameFeaturesSubsystemSettings
+***** UGameFeaturesSubsystemSettings
 
-** Feature State
+*** Feature State
 
 * Mass (ECS)
 
@@ -2458,31 +2880,77 @@ Load *All* GameFeatures
 
 *** =TArray=
 
+**** Sort (in 2023)
+
+> Thanks to =Laura= from discord.
+
+TArray's Sort is a non-static member, but it's strictly worse than =Algo::Sort()=.
+
+TArray::Sort() dereferences pointers, Algo::Sort doesn't.
+
+Use =std::sort()= and =std::stable_sort()= (=eastl::sort()= is faster, or at least =Algo::Sort()= or =Algo::StableSort()=).
+
+#+begin_src cpp
+  #include <algorithm>
+
+  TArray<int> x;
+  std::sort(x.GetData(), x.GetData() + x.Num(), ...);
+#+end_src
+
+#+begin_src cpp
+  std::sort(FilteredSlots.GetData(), FilteredSlots.GetData() + FilteredSlots.Num(), [this, bReverseSort](UItemSlot* SlotA, UItemSlot* SlotB)
+  {
+      const FEntityTraits& SlotATraits = SlotA->GetEntityTraits();
+      const FEntityTraits& SlotBTraits = SlotB->GetEntityTraits();
+
+      UInventoryDevSettings& DevSettings = UInventoryDevSettings::Get();
+
+      const int32& SlotARarity = *DevSettings.ItemRaritySortOrder.Find(SlotATraits.TagTraits.FindRef(TAG_Entity_Trait_Tag_Entity_Rarity));
+      const int32& SlotBRarity = *DevSettings.ItemRaritySortOrder.Find(SlotBTraits.TagTraits.FindRef(TAG_Entity_Trait_Tag_Entity_Rarity));
+
+      return (SlotARarity < SlotBRarity) ^ bReverseSort;
+  });// Munkeysocks from discord
+#+end_src
+
 *** =TSet=
 
 *** =TMap=
 
+** Cast
+
+That's the point, in C++ you would usually use =dynamic_cast= in your case but UE has _RTTI disabled_, which does runtime evaluation.
+
+=static_cast= just makes sure the type exists and appropriate conversion can be performed, it's completely on you to make sure the object is actually of the type you are trying to cast too.
+
 ** =FString= & =FText= & =FName=
 
-| Class   | Bytes |
-|---------+-------|
-| =FString= |    40 |
-| =FText=   |    16 |
-| =FName=   |     4 |
+| Class   | Bytes | Case        | Localization  | Usage                         |
+|---------+-------+-------------+---------------+-------------------------------|
+| =FString= |    40 | Sensitive   | Not localized | ?                             |
+| =FText=   |    16 | Sensitive   | Localized     | for all text shown to players |
+| =FName=   |     4 | Insensitive | Not localized | for IDs                       |
+
+- =FString= objects store their own character arrays.
+- =FText= and =FName= store an index to a shared character array, establish equality by index value.
 
 *** =FString=
 
-Mutable
+Can be searched, modified, and compared against other strings. (Mutable)
 
 *** =FText=
 
 The primary component for text localization, all user-facing text should use this class.
+
+- =AsCultureInvariant()= or =INVTEXT= macro for localization.
+- create a blank FText using either =FText::GetEmpty()=, or just =FText()=.
 
 *** =FName=
 
 FNames are case-*insensitive*. They are immutable, and cannot be manipulated.
 
 *** =TEXT()= Macro
+
+the TEXT macro exists because different platforms use different text char sizes, just makes sure that the raw string you pass becomes a proper string like from "hello" to L"hello".
 
 #+begin_src cpp
   "Hello World!";             // An ANSI character (8-bit fixed-width)  strlen("Hello") = 5;
@@ -2492,6 +2960,14 @@ FNames are case-*insensitive*. They are immutable, and cannot be manipulated.
   // Use TCHAR* type
   const TCHAR* TcharString = TEXT("Hello World!");
 #+end_src
+
+- FName don't need TEXT macro
+
+  #+begin_src cpp
+    FName("foo");
+  #+end_src
+
+  therefore CDSO(=CreateDefaultSubobject<>(FName SubobjectName, ...)=) don't need TEXT macro.
 
 ** Smart Pointer =:Deleter=
 
@@ -2513,7 +2989,24 @@ Weak Pointers are similar to Shared Pointers, but do not own the object they ref
 
 Since there can only be one Unique Pointer to a given resource, Unique Pointers can transfer ownership, but cannot share it.
 
+** Hard & Soft Reference
+
+TODO Okatsu DataAsset
+
 ** Delegates
+
+- Multicast :: More than one function can subscribe to the delegate at the same time.
+- Dynamic :: For our purposes, this just means that it is compatible with Blueprints.
+
+*** using a delegate
+
+**** Declare the delegate's signature
+
+**** Create variables of your new delegate
+
+**** Subscribe to the delegate
+
+**** Execute the delegate
 
 *** Single
 
@@ -2633,6 +3126,8 @@ do not supports payload variables
 
 ** Interface
 
+> They let you define a set of functionality that anything can implement, and not be tied to a rigid class hierarchy.
+
 *** Use Interface
 
 #+begin_src cpp
@@ -2641,14 +3136,14 @@ do not supports payload variables
   //if (Actor->GetClass()->ImplementsInterface(USomeInterface::StaticClass))
   //if (Actor->Implements<USomeInterface>())
   //{
-  //    Cast<ISomeInterface>(Actor)->Foo();// For calling C++ only inplementation
-  //    ISomeInterface::Execute_Foo(Actor);// For calling blueprint inplementation
+  //    Cast<ISomeInterface>(Actor)->Foo();// For calling C++ only implementation
+  //    ISomeInterface::Execute_Foo(Actor);// For calling blueprint implementation marked as UFUNCTION(BlueprintNativeEvent/BlueprintImplementableEvent)
   //}
 
   if (ISomeInterface* interface = Cast<ISomeInterface>(Actor))
   {
-      interface->Foo();// For calling C++ only inplementation
-      interface->Execute_Foo(Actor);// For calling blueprint inplementation
+      interface->Foo();// For calling C++ only implementation
+      interface->Execute_Foo(Actor);// For calling blueprint implementation marked as UFUNCTION(BlueprintNativeEvent/BlueprintImplementableEvent)
   }
 #+end_src
 
@@ -2815,7 +3310,9 @@ If initialization fails, the thread stops execution and returns an error code. I
 
 *** TaskGraph
 
-** =UE_LOG= Tool
+** Logging
+
+*** =UE_LOG= (old)
 
 #+begin_src cpp
   int myInt{ 42 }; // Use Aggregate initialization
@@ -2824,9 +3321,128 @@ If initialization fails, the thread stops execution and returns an error code. I
   UE_LOG(LogTemp, Warning, TEXT("int: %d, float: %f, bool: %d"), myInt, myFloat, myBool);
 
   FString mtString{ TEXT("My String!") };
-  UE_LOG(LogTemp, Warning, TEXT("FString mtString: %s"), *myString);
+  UE_LOG(LogTemp, Warning, TEXT("%s: FString mtString: %s"), ANSI_TO_TCHAR(__FUNCTION__), *myString);
   UE_LOG(LogTemp, Warning, TEXT("Name of Instance: %s"), *GetName());
+  UE_LOG(LogTemp, Warning, TEXT("Name of Actor: %s"), *GetNameSafe(myActor));  // GetNameSafe will return TEXT("None") if myActor is nullptr
   // The asterisk(*) here is not dereference but a overload to convert FString Object to C style string (const TCHAR array)
+#+end_src
+
+*** =UE_LOGFMT= (Structured Log)
+
+- support basic types and some core engine types (FString, TArray, FDateTime, etc.)
+
+  #+begin_src cpp
+    #include "Logging/StructuredLog.h"
+
+    // positional parameters
+    UE_LOGFMT(LogTemp, Log, "The actor {0} in {1} {2} on {3}.",  // 0-16 fields values
+        GetName(), locationVector.ToString(), "jumped", FDateTime::Today());
+    // print LogTemp: The actor character0 in X=0 Y=0 Z=0 jumped on 2042-04-02T00:00:00.000Z.
+
+    // named parameters
+    UE_LOGFMT(LogTemp, Log, "The actor {Name} in {Location} {Action} on {Time}.",  // 0-16 fields values
+        ("Name", GetName()), ("Location", locationVector.ToString()), ("Action", "jumped"),
+        ("Time", FDateTime::Today()));
+    // print LogTemp: The actor character0 in X=0 Y=0 Z=0 jumped on 2042-04-02T00:00:00.000Z.
+
+    // localized logging
+    UE_LOGFMT_LOC(CategoryName, Verbosity, Key, Format, ...)
+    UE_LOGFMT_NSLOC(CategoryName, Verbosity, Namespace, Key, Format, ...)
+  #+end_src
+
+- support custom serialization for any type (=operator<<(FCbWriter&, FieldType)=)
+
+  #+begin_src cpp
+    struct FCoolType
+    {
+        bool bIsCool = false;
+        int32 CoolRating = 0;
+    };
+
+    FCbWriter& operator<<(FCbWriter& Writer, const FCoolType& Data)
+    {
+        Writer.BeginObject();
+        Writer << "IsCool" << Data.bIsCool;
+        Writer << "CoolRating" << Data.CoolRating;
+        Writer.EndObject();
+
+        return Writer;
+    }
+  #+end_src
+
+  #+begin_src cpp
+    FCoolType CoolData = { true, 1337 };
+    FCoolType UncoolData = { false, 0 };
+
+    UE_LOGFMT(LogCool, Log, "{Data1} vs {Data2}", CoolData, UncoolData);
+    // print LogCool: {"IsCool":true,"CoolRating":1337} vs {"IsCool":false:,"CoolRating":0}
+  #+end_src
+
+*** AbilitySystemLog
+
+#+begin_src cpp
+  #include "AbilitySystemLog.h"
+
+  ABILITY_LOG(Warning, TEXT(""));
+  // same to UE_LOG(LogAbilitySystem, Warning, TEXT(""));
+#+end_src
+
+*** Log Verbosity Levels
+
+| Verbosity Level       | Printed in Console? | Printed in Editor's Log? | Notes                                            | Intend                                                                          |
+|-----------------------+---------------------+--------------------------+--------------------------------------------------+---------------------------------------------------------------------------------|
+| Fatal (Lowest)        | Yes                 | N/A                      | Crashes the session, even if logging is disabled |                                                                                 |
+| Error                 | Yes                 | Yes                      | Log text is coloured red                         |                                                                                 |
+| Warning               | Yes                 | Yes                      | Log text is coloured yellow                      |                                                                                 |
+| Display               | Yes                 | Yes                      | Log text is coloured grey                        |                                                                                 |
+| Log                   | No                  | Yes                      | Log text is coloured grey                        | This happened. What gameplay programmers may care about to debug                |
+| Verbose               | No                  | No                       |                                                  | This is why this happened. What you may turn on to debug the skill system code. |
+| VeryVerbose (Highest) | No                  | No                       |                                                  | This is what didn't happen, and why. Extreme printf debugging                   |
+
+*** Custom Log Categories
+
+- header
+
+  #+begin_src cpp
+    DECLARE_LOG_CATEGORY_EXTERN(LogCustom, Log, All);
+    // DECLARE_LOG_CATEGORY_EXTERN(CategoryName, DefaultVerbosity, CompileTimeVerbosity)
+    // Anything more verbose than CompileTimeVerbosity will not be compiled
+  #+end_src
+
+- cpp
+
+  #+begin_src cpp
+    DEFINE_LOG_CATEGORY(LogCustom);
+  #+end_src
+
+*** Printing Messages to Screen
+
+#+begin_src cpp
+  GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("This message will appear on the screen!"));
+  //
+#+end_src
+
+*** Viewport Stats Subsystem
+
+> 4.26 adds the Viewport Stats Subsystem, allowing to add messages to the current viewport such as "LIGHTING NEEDS TO BE REBUILT" and "BLUEPRINT COMPILE ERROR". Following code sample is copy-pasted directly from this class. Simply inspect this class to check all available options.
+
+#+begin_src cpp
+  if (UViewportStatsSubsystem* ViewportSubsystem = GetWorld()->GetSubsystem<UViewportStatsSubsystem>())
+  {
+      // Bind a member function delegate to the subsystem...
+      FViewportDisplayCallback Callback;
+      Callback.BindDynamic(this, &UCustomClass::DisplayViewportMessage);
+      ViewportSubsystem->AddDisplayDelegate(Callback);
+
+      // ... or use inline lambda functions
+      ViewportSubsystem->AddDisplayDelegate([](FText& OutText, FLinearColor& OutColor)
+      {
+          // Some kind of state management
+          OutText = NSLOCTEXT("FooNamespace", "Blarg", "Display message here");
+          OutColor = FLinearColor::Red;
+          return bShouldDisplay;
+      });
+  }
 #+end_src
 
 ** Diagnostic Checks (*Asserts*)
@@ -3107,6 +3723,25 @@ So, for objects where being Null is a valid state (like anything that can be gar
   check(Ptr);// or
   if(!Ptr) return;
 #+end_src
+
+** Lambda
+
++ Never, ever use [&] or [=], they captures *everything* in the current scope.
+
+#+begin_src cpp
+  [CharacterClass, var1, &var2](const FStAbilityData& a, const FStAbilityData& b){
+      return a.AllowedClasses[CharacterClass] < b.AllowedClasses[CharacterClass]
+  }
+  // CharacterClass was a variable defined in the same scope as the lambda (and before it, obviously).
+  // Other common uses of [] are [this] to capture the local object pointer (be careful because the object might just be GC'd at some point if it's asynchronous).
+  // Or [&SomeVariable] to capture it by reference.
+  // You can also create variables inside the capture, e.g. [SomeNewVar = TWeakObjectPtr(this)]
+#+end_src
+
+One last thing, is the lambda (or whatever) ever complains about a return type, you can do: =[]() -> ReturnType {}= (e.g. =[]() -> FString { return FString("moo"); }=)
+It's usually worked out automatically, but it doesn't always get it right.
+
+> Thanks to =Daekesh= from discord.
 
 ** C++ *and* Blueprint
 
@@ -4072,23 +4707,77 @@ But is good for creating an orientation from a given direction vector and nomina
 
 Whereas =FTransform= refers to Translation, =FMatrix= refers to Origin
 
-* Data
+* Data Management
 
-** CDO
+** CDO (Blueprint property)
 
 ** ConstructHelper
 
 ** Data Table
 
++ pros
+  - csv file support
+  - editing properties during runtime
++ cons
+  - hard to get data (using row name)
+  - loading all content in once
+  - no multiple editing support
+
 *** DataTable
+
+**** Get Data
+
+- =Get Data Table Row Names=
+- =Get Data Table Row ...(SomeDataTable)=
 
 *** CompositeDataTable
 
 ** Data Asset
 
-*** DataAsset
++ pros (compare to Data Table)
+  - disentanglement
+  - easy cooperation
+  - get/set without Cast
+  - used outside of blueprint (e.g. as AnimNotify parameter)
 
-*** PrimaryDataAsset
++ Function support (Base on blueprint), and can be *called in editor* using button (e.g. check button)
++ Use _soft reference_ to reduce loading time
+
+*** UDataAsset (native)
+
+*** UPrimaryDataAsset
+
+#+begin_src cpp
+  UCLASS(Abstract, BlueprintType, ClassGroup = Equipment, Category = "Equipment", Meta = (DisplayName = "Some Data", ShortTooltip = "Data asset used to define a something."))
+  class GAME_API USomeData : public UPrimaryDataAsset
+  {
+      GENERATED_BODY()
+
+      ...
+
+      UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Some Property")
+      FText ItemName;
+      ...
+  }
+#+end_src
+
+*** Call in Editor (UFUNCTION modifier)
+
+generate editor button
+
+*** with DataTable
+
+Use =DataTable= or csv file to view/generate plenty of =DataAsset=.
+
+TODO
+
+*** with Subsystem
+
+*** with GAS
+
+** Asset Manager
+
+Async data loading management
 
 ** Curve Table
 
@@ -4101,6 +4790,40 @@ Whereas =FTransform= refers to Translation, =FMatrix= refers to Origin
 * Asset Management (Loading)
 
 ** pak dlc chunk
+
+** package cook
+
+when using a string path to reference blueprint class in C++ (i.e. FClassFinder), the blueprint asset won't be cook and packaged.
+
+reference asset in map or add directory path to =DirectoriesToAlwaysCook= array.
+
+- DefaultGame.ini
+
+#+begin_src ini
+  [/Script/UnrealEd.ProjectPackagingSettings]
+  +DirectoriesToAlwaysCook=(Path="/Game/ThirdPersonCPP/Blueprints")
+#+end_src
+
+** UClass String Path
+
+- Native UClass :: ="/Script/{ModuleName}.{ClassName (without U/A prefix)}"=
+
+- Blueprint UClass :: ="/{Engine|Game|PluginName}/{PathToAsset}/{Package(Asset)Name}[.{ClassName}_C (optional)]"=
+  > =ConstructorHelpers::FClassFinder= can automatically add class name suffix.
+
+- Blueprint Object :: ="/{Engine|Game|PluginName}/{PathToAsset}/{Package(Asset)Name}.{ObjectName}[:{SubObjectName}]"=
+
+* Save & Settings
+
+** add custom =ProjectSettings= (INI)
+
+*** Inherit =UDeveloperSettings=
+
+> DeveloperSettings is a Module. Creating a UDeveloperSettings derived class will add this module to your .uproject automatically. If it doesn’t or you want all your modules in the .Build.cs file then you should add DeveloperSettings manually.
+
+** DeveloperSettingsBackedByCVars
+
+binding with Console Variables (CVars) and project/editor settings
 
 * Multiplayer
 ** Peer-to-Peer
@@ -4128,22 +4851,7 @@ connect with each other without knowing IP address
 =NetConnection=
 =Channel=
 
-** Authority & Role
-
-#+begin_src cpp
-  enum ENetRole
-  {
-      ROLE_None,            // HasAuthority() => false
-      ROLE_SimulatedProxy,  // HasAuthority() => false
-      ROLE_AutonomousProxy, // HasAuthority() => false
-      ROLE_Authority,       // HasAuthority() => true
-      ROLE_MAX,
-  }
-#+end_src
-
-+ =ROLE_Authority= :: Replicated object on the server (almost all), or non-replicated object on client.
-+ =ROLE_SimulatedProxy= :: Replicated object controlled by value _replicated from server_.
-+ =ROLE_AutonomousProxy= :: Replicated object relies on a client uploading values to the server (some values can still be server authoritative) to be replicated for other clients to simulate.
+** Authority
 
 #+begin_src cpp
   if (HasAuthority())
@@ -4179,9 +4887,68 @@ connect with each other without knowing IP address
     checkf(IsLocallyControlled(), TEXT("Pawn must be locally controlled!"));
   #+end_src
 
+** Role & RemoteRole of Actor
+
+#+begin_src cpp
+  enum ENetRole
+  {
+      ROLE_None,            // HasAuthority() => false
+      ROLE_SimulatedProxy,  // HasAuthority() => false
+      ROLE_AutonomousProxy, // HasAuthority() => false
+      ROLE_Authority,       // HasAuthority() => true
+      ROLE_MAX,
+  }
+#+end_src
+
++ =ROLE_Authority= :: Replicated object on the server (almost all), or non-replicated object on client.
++ =ROLE_SimulatedProxy= :: Replicated object controlled by _value replicated from server_.
++ =ROLE_AutonomousProxy= :: Replicated object relies on a client uploading values (usually human inputs) to the server (some values can still be server authoritative) to be replicated for other clients to simulate.
+
+*** Mode of Replication
+
+Predict movement between updates which replicate with =AActor::NetUpdateFrequency= might be low.
+
+- =ROLE_SimulatedProxy= :: using last known velocity (can custom code to use some other information to extrapolate between server updates).
+- =ROLE_AutonomousProxy= :: have a bit more information, and can use actual human inputs to fill in the missing info (rather than extrapolating based on the last known velocity).
+
+*** e.g.
+
+- Dedicated Server
+
+  - Client 1 Character
+    - Role :: Authority
+    - RemoteRole :: Autonomous Proxy
+
+  - Client 2 Character
+    - Role :: Authority
+    - RemoteRole :: Autonomous Proxy
+
+- Client 1
+
+  - Client 1 Character
+    - Role :: Autonomous Proxy
+    - RemoteRole :: Authority
+
+  - Client 2 Character
+    - Role :: Simulated Proxy
+    - RemoteRole :: Authority
+
+- Client 2
+
+  - Client 1 Character
+    - Role :: Simulated Proxy
+    - RemoteRole :: Authority
+
+  - Client 2 Character
+    - Role :: Autonomous Proxy
+    - RemoteRole :: Authority
+
+
 ** Property Replication
 
 eventually
+
+> Tips: RepNotify functions behavior different on C++ and blueprint, blueprint's OnRep also runs in server.
 
 *** header
 
@@ -5025,6 +5792,14 @@ Macro
 
 ** Build Configuration
 
+** Build scripts
+
+#+begin_src csharp
+  PublicDependencyModuleNames.AddRange(new string[]{ "Core", "CoreUObject", "Engine"});
+#+end_src
+
+> Build scripts are written in C# and this line adds decencies to the your module build rules, “Core” module contains most basic functions that you use in C++ inside UE4, “CoreUObject” contains module UObject system, root of class tree in UE4 and “Engine” is core of engine it self. Engine is divided in to more modules (“Engine” module only contains core things), you can see them as dlls in binary folder in the engine and you need to add decency if you referenceing anything from that specific module, this way UnrealBuidTool knows what to build during packaging and properly configures compilation environment for your module, so build is fully optimized.
+
 * *Scripting And Automation*
 
 ** Editor Widgets
@@ -5065,7 +5840,127 @@ Enable "Python Editor Script Plugin"
   #+end_src
 + =init_unreal.py=
 
-* Editor Utility Widget
+* Editor Utilities
+
+** Add MyGameEditor Module alongside Game Module
+
++ Create new editor module under Source folder
+
++ Add the editor module to Source/MyGameEditor.Target.cs
+
+#+begin_src csharp
+public class MyGameEditorTarget : TargetRules
+{
+    public MyGameEditorTarget(TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Editor;
+        DefaultBuildSettings = BuildSettingsVersion.V4;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+
+        // Add our editor module
+        ExtraModuleNames.AddRange(new string[] { "MyGame", "MyGameEditor" });
+    }
+}
+#+end_src
+
+** Editor Validator Subsystem
+
+This is for proper asset config, expand *Validate Assets* processing when save an asset.
+
+*** Implement
+
+1. Inherit from =UEditorValidatorBase= (C++ or Editor Utility Blueprint)
+
+2. Override function =CanValidateAsset_Implementation(UObject* InAsset)= to specify which kinds of asset to check
+
+  - e.g. check material functions
+
+    #+begin_src cpp
+    bool UEditorValidator_MaterialFunctions::CanValidateAsset_Implementation(UObject* InAsset) const
+    {
+        return Super::CanValidateAsset_Implementation(InAsset) && (InAsset ? InAsset->IsA(UMaterialFunction::StaticClass()) : false);
+    }
+    #+end_src
+
+  - e.g. validate specific asset path
+
+    #+begin_src cpp
+    bool UEditorValidator_MaterialFunctions::CanValidateAsset_Implementation(UObject* InAsset) const
+    {
+        if (InAsset)
+        {
+            if (!InAsset->IsA(UBlueprint::StaticClass())) return(false);
+
+            // Asset path contaims "Game/Character/"
+            UBlueprint* Blueprint = Cast<UBlueprint>(InAsset);
+            if (Blueprint->GetPathName().Contains(TEXT("/Game/Character/"), ESearchCase::CaseSensitive))
+            {
+                return(true);
+            }
+
+            // use wildcard pattern matching
+            //if (Blueprint->GetPathName().MatchesWildcard(TEXT("/Game/Character/Chara??BP.*"), ESearchCase::CaseSensitive))
+            //{
+            //    return(true);
+            //}
+        }
+
+        return(false);
+    }
+    #+end_src
+
+3. Override function =ValidateLoadedAsset_Implementation(UObject* InAsset, TArray<FText>& ValidationErrors)= to implement validate logic
+
+  - If check passes, call =AssetPasses(InAsset)= (C++/BP) and will return =EDataValidationResult::Valid=.
+  - If check fails, call =AssetFails(InAsset, FText::FromString(WarningOrError), ValidationErrors)= and will return =EDataValidationResult::Invalid=.
+  - Similar for warning.
+
+  #+begin_src cpp
+  EDataValidationResult UEditorValidator_MaterialFunctions::ValidateLoadedAsset_Implementation(UObject* InAsset, TArray<FText>& ValidationErrors)
+  {
+      // ...
+
+      if (GetValidationResult() != EDataValidationResult::Invalid)
+      {
+          AssetPasses(InAsset);
+      }
+
+      return GetValidationResult();
+  }
+  #+end_src
+
+*** e.g. Validate AActor
+
+- Since using actor CDO for validation, properties of the actor's components can be checked only if components created by =CreateDefaultSubobject= via actor constructor.
+
+  #+begin_src cpp
+  EDataValidationResult UMyEditorValidatorBase::ValidateLoadedAsset_Implementation(UObject* InAsset, TArray<FText>& ValidationErrors)
+  {
+    UBlueprint* Blueprint = Cast<UBlueprint>(InAsset);
+    check(Blueprint);
+
+    AActor* CDO = Blueprint->GeneratedClass->GetDefaultObject<AActor>();
+    if (!CDO)
+    {
+        AssetFails(InAsset, FText::FromString(TEXT("FAILED to get CDO")), ValidationErrors);
+    }
+    else
+    {
+        // check code
+    }
+
+    if (GetValidationResult() != EDataValidationResult::Invalid)
+    {
+        AssetPasses(InAsset);
+    }
+
+    return GetValidationResult();
+  }
+  #+end_src
+
+** Editor Utility Widget
+
+TODO
 
 * Rendering
 
@@ -5100,7 +5995,7 @@ ToneCurveAmount 0
   [/Script/Engine.RendererSettings]
 #+end_src
 
-* *Performance and Profiling*
+* *Performance & Profiling & Optimization*
 
 Early and often, but only optimize after profiling shows problems.
 
@@ -5118,9 +6013,11 @@ Project Settings > General Settings > Framerate group
 
 *** Make a Test Build
 
-** Task System
+** Multithreading
 
-** TaskGraph
+*** Task System
+
+*** TaskGraph
 
 * *Gameplay Features*
 
@@ -5133,7 +6030,44 @@ Project Settings > General Settings > Framerate group
 + Tracking Reticle when player "attempt" to aim to target
 
 * Localization
+
 + FText :: For End User, localization
+
+** FText and LOCTEXT namespace
+
+#+begin_src cpp
+  #define LOCTEXT_NAMESPACE "Foo"
+  ...
+  const FText TitleText = LOCTEXT("Title", "WarningMassege"); // same with NSLOCTEXT("Foo", "Title", "WarningMassege")
+  ...
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+> in UE4 localization strings are namespaced (to avoid name collisions with the rest of engine code) and to avoid typing it all the time over and over again in =NSLOCTEXT=, you define =LOCTEXT_NAMESPACE= and use =LOCTEXT= instead _without need of typing in namespace_.
+
+** Format & Plurals
+
+> Note: FormatText is NOT free, avoid updating every frame, using delegates and events, or cache the value and apply to UI when it changes.
+
+https://benui.ca/unreal/ui-localization/
+
+- Blueprint :: =Format Text= node
+- C++
+  #+begin_src cpp
+    FFormatNamedArguments Args;
+    Args.Add("GivenNames", GivenNames);
+    Args.Add("FamilyName", FamilyName);
+
+    FText FormattedText = FText::Format(
+        NSLOCTEXT("MyNamespace", "FullNameFormat", "{GivenNames} {FamilyName}"),
+        Args
+    );
+    // You can also use LOCTEXT() (define a LOCTEXT_NAMESPACE and undefine LOCTEXT_NAMESPACE at the bottom of your cpp file).
+    // If you want non-translatable formats, you can use INVTEXT():
+    // FText::Format(INVTEXT("Some format {0} Moo"), YourFTextVariable);
+
+    NameLabel->SetText(FormattedText);
+  #+end_src
 
 * Console (Cmd)
 
@@ -5226,6 +6160,14 @@ e.g. GameMode.h
   - AssetRegistryCache, cache for Asset Registry system, an index for asset
 - Saved(gitignore) :: for save, log, info files
 - Source :: source code
+
+** Git usage
+
+- Git LFS
+
+  #+begin_src shell
+    git lfs install
+  #+end_src
 
 ** *Pitfall*
 
@@ -5406,6 +6348,35 @@ Put these batch files together with the project folder
   build && editor -log
 #+end_src
 
+** Unresolved external error
+
+There 3 most common reasons why can have Unresolved External Symbols linker error:
+
+- You declared non-virtual function (standard function) but you didn’t define code for it
+- The function is in different module and you didn’t add dependency of that module in build script (*.build.cs file)
+- Class you trying to use is declared as MinimalAPI or missing extern (=MODULENAME_API= macro) and can not be used outside of it’s module (in this case you would need to modify engine and rebuild it, possible for game projects no go for plugins)
+
+Number 2 and 3 are UE4 specific, related to UE4 build system and it’s configuration.
+
+** Ternary Operator(?:) with TObjectPtr
+
+TObjectPtr is for UProperty, so if we use raw pointer and TObjectPtr with ternaries, it get a compile error.
+
+The solution is add a =.Get()= to TObjectPtr.
+
+#+begin_src cpp
+  APawn* pawn = Condition() ? RawPointerPawn : TObjectPtrPawn.Get();
+#+end_src
+
+> from siliex: Ternaries are a bit weird because they need to infer what type they return from two places.
+> The issue is that you're technically returning two types from the ternary (which is a big no-no).
+> The ternary can actually handle that situation because there's an implicit conversion from TObjectptr -> normal pointer... but there's also one from normal pointer -> TObjectPtr.
+> So it has two equally valid choices and gives up.
+
+** Micro-optimizations
+
+- =FVector::Distance()= is slightly faster than =(a-b).Size()=.
+
 * Style Guide
 
 ** Asset Naming Convention
@@ -5519,4 +6490,4 @@ Select bones > Clear Parent (Alt+P) > Disconnect Bone > Rotate bones by individu
 #  LocalWords:  FWorldContext AActor UPrimitiveComponent UObject UX
 #  LocalWords:  Ragdoll RawInput DualShock config Rotators rotator
 #  LocalWords:  wireframe Async Viewports Viewmodel TAA Gameplay ECS
-#  LocalWords:  Viasfora IntelliSense MVVM
+#  LocalWords:  Viasfora IntelliSense MVVM init gameplay TObjectPtr
