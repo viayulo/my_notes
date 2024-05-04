@@ -903,6 +903,20 @@ For standalone, there is only one FWorldContext
   UGameViewportClient* GameViewport;
  #+end_src
 
+**** World Context Object
+
+There can be multiple UWorlds in an Unreal Engine game and editor. The editor for example, has one for the editor and one for play in editor window.
+
+It is the top level object representing a map or sandbox in which actors and components will exist and be rendered.
+
+Hence, some functions require context of which world to access. Typically something like the spawn actor from class blueprint gets the world context automatically from the actor the function was called in.
+
+In C++ it's literally called on the UWorld object, so you already knows which one to use. (If you don't you have to get it such as =GEngine->GetWorldFromContextObject(this, EGetWorldErrorMode::ReturnNull)= and input something like an existing actor instance.
+
+Any who there are also multiple worlds when dealing with multiplayer, each client having their own, the server having its own.
+
+WorldContextObject can be anything with an implemented GetWorld() function. Most frequently this will be an Actor or =this=, but GetWorld() should have worked just fine.
+
 *** =UGameInstance= : UObject
 
 #+begin_src cpp
@@ -1650,7 +1664,7 @@ instanced per player
 
 + Add DualShock4 config to =DefaultInput.ini=
 
-  #+begin_src ini
+  #+begin_src conf
     [/Script/RawInput.RawInputSettings]
     +DeviceConfigurations=(VendorID="0x054C",ProductID="0x05C4",AxisProperties=((Key=Gamepad_RightY,bInverted=True,bGamepadStick=True),(Key=Gamepad_RightX,bGamepadStick=True),(Key=Gamepad_LeftY,bInverted=True,bGamepadStick=True),(Key=Gamepad_LeftX,bGamepadStick=True),(Key=Gamepad_Special_Left_X,Offset=-1.142857),(bEnabled=False,Key=GenericUSBController_Axis6),(Key=Gamepad_RightTriggerAxis),(Key=Gamepad_LeftTriggerAxis)),ButtonProperties=((Key=Gamepad_FaceButton_Left),(Key=Gamepad_FaceButton_Bottom),(Key=Gamepad_FaceButton_Right),(Key=Gamepad_FaceButton_Top),(Key=Gamepad_LeftShoulder),(Key=Gamepad_RightShoulder),(Key=Gamepad_LeftTrigger),(Key=Gamepad_RightTrigger),(Key=Gamepad_Special_Left),(Key=Gamepad_Special_Right),(Key=Gamepad_LeftThumbstick),(Key=Gamepad_RightThumbstick),(Key=GenericUSBController_Button13),(Key=GenericUSBController_Button14),(bEnabled=False,Key=GenericUSBController_Button15),(bEnabled=False,Key=GenericUSBController_Button16),(bEnabled=False,Key=GenericUSBController_Button17),(bEnabled=False,Key=GenericUSBController_Button18),(bEnabled=False,Key=GenericUSBController_Button19),(bEnabled=False,Key=GenericUSBController_Button20)))
     +DeviceConfigurations=(VendorID="0x054C",ProductID="0x09CC",AxisProperties=((Key=Gamepad_RightY,bInverted=True,bGamepadStick=True),(Key=Gamepad_RightX,bGamepadStick=True),(Key=Gamepad_LeftY,bInverted=True,bGamepadStick=True),(Key=Gamepad_LeftX,bGamepadStick=True),(Key=Gamepad_Special_Left_X,Offset=-1.142857),(bEnabled=False,Key=GenericUSBController_Axis6),(Key=Gamepad_RightTriggerAxis),(Key=Gamepad_LeftTriggerAxis)),ButtonProperties=((Key=Gamepad_FaceButton_Left),(Key=Gamepad_FaceButton_Bottom),(Key=Gamepad_FaceButton_Right),(Key=Gamepad_FaceButton_Top),(Key=Gamepad_LeftShoulder),(Key=Gamepad_RightShoulder),(Key=Gamepad_LeftTrigger),(Key=Gamepad_RightTrigger),(Key=Gamepad_Special_Left),(Key=Gamepad_Special_Right),(Key=Gamepad_LeftThumbstick),(Key=Gamepad_RightThumbstick),(Key=GenericUSBController_Button13),(Key=GenericUSBController_Button14),(bEnabled=False,Key=GenericUSBController_Button15),(bEnabled=False,Key=GenericUSBController_Button16),(bEnabled=False,Key=GenericUSBController_Button17),(bEnabled=False,Key=GenericUSBController_Button18),(bEnabled=False,Key=GenericUSBController_Button19),(bEnabled=False,Key=GenericUSBController_Button20)))
@@ -1807,7 +1821,62 @@ Interface for assets which contain gameplay tags.
   }
 #+end_src
 
+** Add CustomTag.ini to Plugin
+
+*** Add .ini file to [PluginFolder]/Config/Tags/
+
+#+begin_src conf
+  [/Script/GameplayTags.GameplayTagsList]
+  GameplayTagList=(Tag="FooBar",DevComment="")
+#+end_src
+
+*** Adding =GameplayTags= to the =PublicDependencyModuleNames= in [PluginFolder]/Source/MyPlugin/MyPlugin.Build.cs
+
+#+begin_src csharp
+  PublicDependencyModuleNames.AddRange(
+      new string[]
+      {
+          "Core",
+          "GameplayTags",
+          // ... add other public dependencies that you statically link with here ...
+      }
+  );
+#+end_src
+
+*** Editing the =StartupModule()= function in [PluginFolder]/Source/MyPlugin/Private/MyPluginModule.cpp
+
+#+begin_src cpp
+  #include "GameplayTagsManager.h"
+  #include "Misc/Paths.h"
+  #include "Modules/ModuleManager.h"
+
+  class FMyPluginModule : public IModuleInterface
+  {
+  public:
+    /** IModuleInterface implementation */
+    virtual void StartupModule() override;
+    virtual void ShutdownModule() override;
+  };
+
+  void FMyPluginModule::StartupModule()
+  {
+    UGameplayTagsManager::Get().AddTagIniSearchPath(FPaths::ProjectPluginsDir() / TEXT("MyPlugin/Config/Tags"));
+  }
+
+  void FMyPluginModule::ShutdownModule()
+  {
+  }
+
+  IMPLEMENT_MODULE(FMyPluginModule, MyPlugin)
+#+end_src
+
 * *State Tree* - /General purpose hierarchical state machine/
+
+** Schema
+
+=StateTreeSchema_FooBar=
+
+need to hardcode FGuid, have enough bits that the likelihood of a duplicate is so incredibly unlikely that you don't have to worry about it as long as you _aren't following an obvious pattern_.
 
 ** execution flow
 
@@ -2880,6 +2949,41 @@ Load *All* GameFeatures
 
 *** =TArray=
 
+**** Memory Allocate
+
+#+begin_src cpp
+  // Data allocated on heap, TArray itself is on stack
+  TArray<int32> RegularTArray = { 1, 2, 3, 4, 5 };
+
+  // Length 4 array on stack
+  TArray<int32, TInlineAllocator<4>> CustomStackAllocatorTArray = { 1, 2, 3 };
+
+  // c-style length 4 array on stack
+  int32 CArray[4] = { 1, 2, 3, 4 };
+#+end_src
+
+#+begin_src cpp
+  // passing reference of TArray is limiting, doesn't work generically for custom stack allocated TArray or c array.
+  auto FuncTakingSpecificType = [](const TArray<int32>& MyArray){
+      int32 Sum = Algo::Accumulate(MyArray, 0);
+      return Sum;
+  };
+
+  FuncTakingSpecificType(RegularTArray);
+  //FuncTakingSpecificType(CustomStackAllocatorTArray); // compile error
+  //FuncTakingSpecificType(CArray); // complie error
+
+  // You can use TArrayView instead
+  auto FuncTakingView = [](TArrayView<int32>& MyView){
+      int32 Sum = Algo::Accumulate(MyView, 0);
+      return Sum;
+  };
+
+  FuncTakingView(RegularTArray);
+  FuncTakingView(CustomStackAllocatorTArray);
+  FuncTakingView(CArray);
+#+end_src
+
 **** Sort (in 2023)
 
 > Thanks to =Laura= from discord.
@@ -2911,6 +3015,34 @@ Use =std::sort()= and =std::stable_sort()= (=eastl::sort()= is faster, or at lea
       return (SlotARarity < SlotBRarity) ^ bReverseSort;
   });// Munkeysocks from discord
 #+end_src
+
+**** TArrayView
+
+TArrayView are cheap, they reference the memory not copy it. You can assign array view to TArray, custom stack allocated TArray or a c array.
+
+array views cannot change size, but you can modify value on the array.
+
+***** Mutability
+
+const does not propagate for TArrayView, a const array view not make elements const.
+
+#+begin_src cpp
+  TArray<int32> MutableArray = { 1, 2, 3 };
+  const TArrayView<int32> ConstButMutableView = MutableArray;
+
+  // still mutable
+  ConstButMutableView[0] = 123;
+
+  // make elements const to protect values
+  TArrayView<const int32> ConstEntryArrayView = MutableArray;
+  ConstArrayView[0] = 123; // compile error
+#+end_src
+
+***** Lifetime
+
+TArrayView's lifetime should be shorter than the array, assign a temporary array to array view could cause undefined behavior.
+
+Also, do not modify the size of array while array view is in scope.
 
 *** =TSet=
 
@@ -2968,6 +3100,60 @@ the TEXT macro exists because different platforms use different text char sizes,
   #+end_src
 
   therefore CDSO(=CreateDefaultSubobject<>(FName SubobjectName, ...)=) don't need TEXT macro.
+
+** =FInstancedStruct=
+
+FInstancedStruct is a polymorphic wrapper for any other USTRUCT(), with complete reflection support. You can safely keep *any* data inside it (Arrays, Object refs, even other USTRUCT(), and you can pass it to UFUNCTION, store as UPROPERTY etc.)
+
+> In the past, building any kind of "generic" UFUNCTION or UPROPERTY in UE that would accept/store arbitrary data meant using UObject instances. This adds a lot of overhead and boilerplate for something so simple, and Epic are about to make it more difficult.
+
+FInstancedStruct do not support delta replication since the underlying type could change, so it replicated atomically.
+
+The only reason to use TInstancedStruct(the type-safe wrapper) over FInstancedStruct is to restrict the type at compile time.
+
+#+begin_src cpp
+  UPROPERTY(EditAnywhere)
+  FMyStruct MyStruct; // you get properties from FMyStruct
+
+  UPROPERTY(EditAnywhere, meta = (BaseStruct = "/Script/MyModule.MyStruct", ExcludeBaseStruct))
+  FInstancedStruct MyStruct; // you get to select any subclass of FMyStruct and then fill out those properties
+#+end_src
+
+*** =FStructView= & =FConstStructView=
+
+#+begin_src cpp
+  #include "StructView.h"
+#+end_src
+
+** =TOptional=
+
+=TOptional= is for optional parameters could be unset(null).
+
+#+begin_src
+  IsSet()
+  GetValue()
+#+end_src
+
+*** About Named return value optimization (NRVO)
+
+NRVO eliminates the unnecessary copying of objects returned from a function by reusing the same memory location that was used for the object inside the function.
+
+#+begin_src cpp
+  // Maybe will NOT optimized due to difference of type local variable and function return type
+  TOptional<Foo> Func()
+  {
+      Foo v = Foo();
+      return v;
+  }
+
+  // Better for NRVO
+  TOptional<Foo> Func()
+  {
+      TOptional<Foo> v;
+      v = Foo();
+      return v;
+  }
+#+end_src
 
 ** Smart Pointer =:Deleter=
 
@@ -3145,6 +3331,38 @@ do not supports payload variables
       interface->Foo();// For calling C++ only implementation
       interface->Execute_Foo(Actor);// For calling blueprint implementation marked as UFUNCTION(BlueprintNativeEvent/BlueprintImplementableEvent)
   }
+#+end_src
+
+*** Define Interface
+
+#+begin_src cpp
+  #pragma once
+
+  #include "UObject/Interface.h"
+
+  #include "MyInterface.generated.h"
+
+  UINTERFACE(BlueprintType, MinimalAPI)
+  class UMyInterface : public UInterface
+  {
+      GENERATED_BODY()
+      // This will always be empty!
+  };
+
+  /**
+   * MyInterface
+   *
+   *  Interface.
+   */
+  class MYMODULE_API IMyInterface
+  {
+      GENERATED_BODY()
+
+  public:
+
+      UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="MyInterface")
+      void Foo();
+  };
 #+end_src
 
 ** =TAttribute=
@@ -4734,18 +4952,76 @@ Whereas =FTransform= refers to Translation, =FMatrix= refers to Origin
 
 ** Data Asset
 
+> Read only objects at runtime
+
 + pros (compare to Data Table)
   - disentanglement
   - easy cooperation
   - get/set without Cast
   - used outside of blueprint (e.g. as AnimNotify parameter)
 
-+ Function support (Base on blueprint), and can be *called in editor* using button (e.g. check button)
++ UFunction support (Base on blueprint), and can be *called in editor* using button (e.g. check button)
+
+  They can have logic (it's not like USTRUCTs where the engine forces no UFUNCTIONs) but they shouldn't (in theory) since they're supposed to just be data holders.
+
+  It's fine if they have read only UFUNCTIONs, what it's implying is to not hold or change state on a DA since that's not what they're for.
+
 + Use _soft reference_ to reduce loading time
+
+> Note: Make sure to create *Asset Instance* through right-click > Miscellaneous > Data Asset. Creating *Blueprint subclasses* of your UDataAsset is not the same thing.
 
 *** UDataAsset (native)
 
+Also keep in mind that the best use of DAs is to replicate info that you know ahead of time....
+
+it's much less data to save or replicate a DA *pointer* than it is to replicate the contents, it has a non-transient path which enables a lot of these things.
+
+so you want to use DAs for data you can know in advance.
+
+#+begin_src cpp
+  UCLASS(CollapseCategories)
+  class UPlantFlowerData : public UObject
+  {
+      GENERATED_BODY()
+  public:
+      UPROPERTY(EditAnywhere)
+      float Radius = 0.5f;
+
+      UPROPERTY(EditAnywhere)
+      int32 Count = 5;
+  };
+
+  UCLASS(BlueprintType)
+  class UPlantDataAsset : public UDataAsset
+  {
+      GENERATED_BODY()
+  public:
+      UPROPERTY(EditAnywhere)
+      FText DisplayName;
+
+      UPROPERTY(EditAnywhere)
+      FSlateBrush Icon;
+
+      // Showing how to do an inlined UObject instance for completeness
+      UPROPERTY(EditAnywhere, Instanced)
+      TArray<UPlantFlowerData*> FlowerDatas;
+
+      // Point to other Data Assets
+      // Instead of raw pointer could also be TObjectPtr<T> or TAssetPtr<T>
+      UPROPERTY(EditAnywhere)
+      TArray<UPlantDataAsset*> ChildPlants;
+  };
+#+end_src
+
 *** UPrimaryDataAsset
+
+Primary = auto managed by the asset manager (implements =GetPrimaryAssetId=), with a primary data asset you get automatic discovery, async loading, etc. through the asset manager.
+
+Another benefit of PrimaryDA is that you can use it as a parent class for a BP based DA class, DA doesn't allow direct BP child classes
+
+Additionally they support *AssetBundles* which are very important for heavy data like meshes, so you can just load one part at a time when needed.
+
+There's also the gameplayfeatures integration to inject more DAs into your game, GameFeature plugins can load new PrimaryDataAssets on load
 
 #+begin_src cpp
   UCLASS(Abstract, BlueprintType, ClassGroup = Equipment, Category = "Equipment", Meta = (DisplayName = "Some Data", ShortTooltip = "Data asset used to define a something."))
@@ -4787,6 +5063,8 @@ Async data loading management
 
 ** Data Registry
 
+** *Data Driven Design*
+
 * Asset Management (Loading)
 
 ** pak dlc chunk
@@ -4799,7 +5077,7 @@ reference asset in map or add directory path to =DirectoriesToAlwaysCook= array.
 
 - DefaultGame.ini
 
-#+begin_src ini
+#+begin_src conf
   [/Script/UnrealEd.ProjectPackagingSettings]
   +DirectoriesToAlwaysCook=(Path="/Game/ThirdPersonCPP/Blueprints")
 #+end_src
@@ -5300,6 +5578,24 @@ some are generated at run-time though, and don't require editing, serialization 
 
 Just so the Unreal Engine knows about, and can manage them via a smart point system
 
+**** EditCondition(meta)
+
+EditCondition can use boolean variable or UFUNCTION that returning a boolean value.
+
+#+begin_src cpp
+  UFUNCTION()
+  bool MyFunc()
+  {
+      return MyInt >5;
+  }
+
+  UPROPERTY(EditAnywhere)
+  int32 MyInt;
+
+  UPROPERTY(EditAnywhere, meta = (EditCondition = "MyFunc()", EditConditionHides))
+  FString MyString;
+#+end_src
+
 ** =UFUNCTION=
 
 *** Specifiers
@@ -5311,6 +5607,51 @@ Just so the Unreal Engine knows about, and can manage them via a smart point sys
 - =BlueprintNativeEvent= :: declared in c++, implemented in c++, and possibly blueprint, the c++ function =Foo_Implementation= will only be called if blueprint implementation doesn't exist
 
 - =Exec= :: The function can be executed from the in-game console. Exec commands only function when declared within *certain Classes*.
+
+*** Override implementation of =BlueprintNativeEvent=
+
+- Make sure that your function was appropriately implemented in the base class.
+
+  #+begin_src cpp
+    // .cpp
+    void ACustomActor::Foo_Implementation()
+    {
+    }
+  #+end_src
+
+- Override in child class like this.
+
+  #+begin_src cpp
+    // header
+    void Foo_Implementation() override;
+
+    // .cpp
+    void ADerivedActor::Foo_Implementation()
+    {
+    }
+  #+end_src
+
+or
+
+#+begin_src cpp
+    // header (base class)
+    UFUNCTION(BlueprintNativeEvent)
+    void Foo();
+    virtual void Foo_Implementation() override;
+
+    // .cpp(base class)
+    void ADerivedActor::Foo_Implementation()
+    {
+    }
+
+    // header
+    virtual void Foo_Implementation() override;
+
+    // .cpp
+    void ADerivedActor::Foo_Implementation()
+    {
+    }
+#+end_src
 
 ** =UCLASS=
 
@@ -5991,7 +6332,7 @@ ToneCurveAmount 0
 
 ***** ini Config
 
-#+begin_src ini
+#+begin_src conf
   [/Script/Engine.RendererSettings]
 #+end_src
 
@@ -6140,7 +6481,7 @@ e.g. GameMode.h
 
 + DefaultEngine.ini
 
-  #+begin_src ini
+  #+begin_src conf
     [SystemSettings]
     OurGame.ExtraMagnetism=1
   #+end_src
@@ -6323,7 +6664,7 @@ Put these batch files together with the project folder
   set PROJECT_DIR=%ROOTDIR%\%PROJECT%
   set UPROJECT_PATH=%PROJECT_DIR%\%PROJECT%.uproject
 
-  set UE_DIR=C:\Program Files\Epic Games\UE_5.0EA
+  set UE_DIR=C:\Program Files\Epic Games\UE_5.0
   set UEEDITOR_EXE=%UE_DIR%\Engine\Binaries\Win64\UnrealEditor.exe
   set BUILD_BAT=%UE_DIR%\Engine\Build\Batchfiles\Build.bat
 #+end_src
@@ -6376,6 +6717,12 @@ The solution is add a =.Get()= to TObjectPtr.
 ** Micro-optimizations
 
 - =FVector::Distance()= is slightly faster than =(a-b).Size()=.
+
+** Disable permutations you don't need
+
+- Disable =Shadowmaps= and =DBuffer decals= on pure real-time illumination games.
+
+** Advanced Renamer Plugin
 
 * Style Guide
 
