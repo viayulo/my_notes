@@ -261,15 +261,45 @@ Attach actors to invisible animated skeleton
 
 ** Notifies
 
+There is two type notify: =Queue= & =Branching Point=, =Queue= is default and less reliable and may have latency, usually used for _cosmetic_ (FX); and =Branching Point= is reliable and trigger immediately, suitable for _gameplay relevant_ things.
+
++ Tip: Hold =Shift= to edit with animation playing
+
 *** AnimNotify
 
-override function =Received_Notify=
+**** Implementation
+
+***** Blueprint
+
+override function =Received_Notify= (for both Queue and Branching Point)
+
+***** Native
+
+- Queue
+
+  override =void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)=
+
+- Branching Point
+
+  set =bIsNativeBranchingPoint = true;= in ctor, and override =void BranchingPointNotify(FBranchingPointNotifyPayload& BranchingPointPayload)=
 
 *** AnimNotifyState
 
+**** Implementation
+
+***** Blueprint
+
 override function =Received_NotifyBegin= =Received_NotifyEnd= =Received_NotifyTick=
 
-+ Hold =Shift= to edit with animation playing
+***** Native
+
+- Queue
+
+  override =NotifyBegin= =NotifyEnd= =NotifyTick=
+
+- Branching Point
+
+  set =bIsNativeBranchingPoint = true;= in ctor, and override =BranchingPointNotifyBegin= =BranchingPointNotifyEnd= =BranchingPointNotifyTick=
 
 use MeshComp->GetOwner to get actor, or use interface
 
@@ -1695,19 +1725,36 @@ instanced per player
 
 [[https://www.thegames.dev/?p=106][Native Gameplay Tags (New in 4.27 and UE5)]]
 
-+ .h
++ header
   #+begin_src cpp
+    #pragma once
+
     #include "NativeGameplayTags.h"
 
-    //if you want to export the tag
-    MYMODULE_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(MYTAG)
+    namespace MyNativeTags
+    {
+        // Declare all of the custom native tags that game will use.
+        MYMODULE_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(MyTag_Foo);
+        MYMODULE_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(MyTag_Bar);
+    }
   #+end_src
 
 + .cpp
 
   #+begin_src cpp
-    UE_DEFINE_GAMEPLAY_TAG(MYTAG, "MyTag")
-    UE_DEFINE_GAMEPLAY_TAG_COMMENT(MYTAG, "MyTag", "Comment here.")
+    namespace MyNativeTags
+    {
+        UE_DEFINE_GAMEPLAY_TAG(MyTag_Foo, "MyTag.Foo");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(MyTag_Bar, "MyTag.Bar", "Comment here.");
+    }
+  #+end_src
+
++ How to use
+
+  #+begin_src cpp
+    #include "MyNativeTags.h"
+
+    HasTag(MyNativeTags::MyTag_Foo);
   #+end_src
 
 ** Adding and using Gameplay Tags in C++
@@ -1822,6 +1869,8 @@ Interface for assets which contain gameplay tags.
 #+end_src
 
 ** Add CustomTag.ini to Plugin
+
+You can add tag .ini file to custom plugin just like what game module does, but I highly recommend native gameplay tags over these.
 
 *** Add .ini file to [PluginFolder]/Config/Tags/
 
@@ -2657,7 +2706,7 @@ and implement the function like this (this is a hard override of the default Gam
 
 * Gameplay Interaction (Plugin)
 
-* *Modular Gameplay Features*
+* *Modular Gameplay*
 
 ** Modular Gameplay
 
@@ -2667,6 +2716,11 @@ and implement the function like this (this is a hard override of the default Gam
 
 This system provides registration and notification functions that make _synchronizing the initialization of components on an Actor_ coordination simpler.
 
+- Why we need this system?
+  In the past (especially when online project), the =BeginPlay()= of components on client might called earlier then =PlayerState= is ready (PlayerState in Controller might be null, or the Owner of PlayerState is not setup as Controller), or another dependent component is not ready.
+
+  The one solution is to check whether the data is available in every related timing (e.g. =OnRep_PlayerState=), this is basically what the system dose, each component only need to care about the state and change condition.
+
 =UGameFrameworkInitStateInterface=
 
 ***** Terminology
@@ -2674,7 +2728,7 @@ This system provides registration and notification functions that make _synchron
 | Term           | Description                                                                                                                                                          |
 |----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | InitState      | User-defined global =GameplayTags= for tracking the initialization and general life cycle of different features (usually implemented by components) attached to Actor. |
-| (Actor)Feature | Unique =FName= identifier in Implementer object (often a component), which has InitState.                                                                    |
+| (Actor)Feature | Unique =FName= identifier in Implementer object (often a component), which has InitState.                                                                              |
 | StateChain     | Linearly arranged InitStates, (usually static) const TArray<FGameplayTag>.                                                                                           |
 
 ***** Lyra
@@ -2702,8 +2756,32 @@ This system provides registration and notification functions that make _synchron
 
 ***** Implementation
 
-****** =RegisterInitStateFeature()=
+****** Inherit =IGameFrameworkInitStateInterface=
 
+******* override =GetFeatureName()=
+
+#+begin_src cpp
+  // header
+    // in class
+    public:
+
+        /** The name of this overall feature, this one depends on the other named component features */
+        static const FName NAME_ActorFeatureName;
+
+  //~ Begin IGameFrameworkInitStateInterface interface
+        virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
+        //~ End IGameFrameworkInitStateInterface interface
+
+  // cpp
+
+  const FName ULyraPawnExtensionComponent::NAME_ActorFeatureName("PawnExtension");
+#+end_src
+
+******* s
+
+****** =RegisterInitStateFeature()= in object =OnRegister()=
+
+Register self with =ModularGameplay= plugin’s =UGameFrameworkComponentManager=
 Registers with the system but does not set a state, this is useful to call from component =OnRegister=.
 
 #+begin_src cpp
@@ -2855,6 +2933,8 @@ This can then be used to call functions like =CheckDefaultInitialization= that m
       }
   }
 #+end_src
+
+****** In character, check if data replicated in every critical phase like =OnRep_PlayerState=, etc.
 
 ** Game Features
 
@@ -5794,14 +5874,14 @@ digraph Dependencies {
 #+begin_src csharp
   "Modules": [
       {
-          "Name": "MyModule",
+          "Name": "FooBar",
           "Type": "Runtime",
           "LoadingPhase": "PreDefault"
       },
       {
-          "Name": "MyModuleEditor",
+          "Name": "FooBarEditor",
           "Type": "Editor",
-          "LoadingPhase": "Default"
+          "LoadingPhase": "PostEngineInit"
       }
   ]
 #+end_src
@@ -5821,27 +5901,367 @@ class MYMODULE_API UMyItemsDatabase : public UDataAsset
 
 *** Add dependency In =Editor= Module
 
-**** build.cs
+**** AssetDefinition (Use this instead of AssetTypeActions after UE5.2)
 
-#+begin_src
+***** YourEditor.build.cs
+
+#+begin_src csharp
             PrivateDependencyModuleNames.AddRange(
                 new string[] {
                     "Core",
                     "CoreUObject",
-                    "Slate",
-                    "SlateCore",
+                    "UnrealEd",
+                    "AssetDefinition",
+                    "Foobar"// Your module
+                }
+            );
+#+end_src
+
+***** Add Factory of the UObject in =Private= folder
+
+****** =Private/Factories/FooBarFactory.h=
+
+#+begin_src cpp
+  #pragma once
+
+  #include "Factories/Factory.h"
+  #include "FooBarFactory.generated.h"
+
+  /**
+   * The factory for the FooBar asset type.
+   * This basically integrates the new asset type into the editor, so you can right click and create a new FooBar asset.
+   */
+  UCLASS(hidecategories=Object)
+  class UFooBarFactory : public UFactory
+  {
+      GENERATED_BODY()
+
+  public:
+      UFooBarFactory();
+
+    //~UFactory interface
+    virtual UObject* FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+    virtual bool ShouldShowInNewMenu() const override;
+    virtual FText GetDisplayName() const override;
+    virtual uint32 GetMenuCategories() const override;
+    //virtual const TArray<FText>& GetMenuCategorySubMenus() const override; // If you want this show in a sub menu
+    virtual FText GetToolTip() const override;
+    virtual bool ConfigureProperties() override;
+    virtual FString GetDefaultNewAssetName() const override;
+    //~End of UFactory interface
+  };
+#+end_src
+
+****** =Private/Factories/FooBarFactory.cpp=
+
+#+begin_src cpp
+  #include "Factories/FooBarFactory.h"
+  #include "Path/to/FooBar.h"
+  #include "AssetTypeCategories.h"
+
+  #define LOCTEXT_NAMESPACE "FooBarFactory"
+
+  UFooBarFactory::UFooBarFactory()
+  {
+      bCreateNew = true;
+      bEditAfterNew = true;
+      SupportedClass = UFooBar::StaticClass();
+  }
+
+  UObject* UFooBarFactory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+  {
+      check(InClass->IsChildOf(UFooBar::StaticClass()));
+      return NewObject<UFooBar>(InParent, InClass, InName, Flags | RF_Transactional, Context);;
+  }
+
+  bool UFooBarFactory::ShouldShowInNewMenu() const
+  {
+      return true;
+  }
+
+  FText UFooBarFactory::GetDisplayName() const
+  {
+      return LOCTEXT("FooBar_DisplayName", "Foo Bar");
+  }
+
+  uint32 UFooBarFactory::GetMenuCategories() const
+  {
+      return EAssetTypeCategories::Gameplay;
+  }
+
+  //const TArray<FText>& UFooBarFactory::GetMenuCategorySubMenus() const
+  //{
+  //	static TArray<FText> SubMenus { LOCTEXT("SubMenuFooBars", "FooBars") };
+  //	return SubMenus;
+  //}
+
+  FText UFooBarFactory::GetToolTip() const
+  {
+      return LOCTEXT("FooBar_Tooltip", "FooBar asset.");
+  }
+
+  bool UFooBarFactory::ConfigureProperties()
+  {
+      return true;
+  }
+
+  FString UFooBarFactory::GetDefaultNewAssetName() const
+  {
+      return FString(TEXT("FB_NewFooBar"));
+  }
+
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+***** Add Definition of the UObject in =Private= folder
+
+****** =Private/AssetTools/AssetDefinition_FooBar.h=
+
+#+begin_src cpp
+  #pragma once
+
+  #include "AssetDefinitionDefault.h"
+  #include "AssetDefinition_FooBar.generated.h"
+
+  UCLASS()
+  class UAssetDefinition_FooBar : public UAssetDefinitionDefault
+  {
+      GENERATED_BODY()
+
+  public:
+      //~UAssetDefinition interface
+      FText GetAssetDisplayName() const override final;
+      TSoftClassPtr<UObject> GetAssetClass() const override final;
+      FLinearColor GetAssetColor() const override final;
+      FText GetAssetDescription(const FAssetData& AssetData) const override final;
+      TConstArrayView<FAssetCategoryPath> GetAssetCategories() const override final;
+      //~End of UAssetDefinition interface
+  };
+#+end_src
+
+****** =Private/AssetTools/AssetDefinition_FooBar.cpp=
+
+#+begin_src cpp
+  #include "AssetTools/AssetDefinition_FooBar.h"
+  #include "Path/to/FooBar.h"
+
+  #define LOCTEXT_NAMESPACE "AssetDefinition_FooBar"
+
+  FText UAssetDefinition_FooBar::GetAssetDisplayName() const
+  {
+      return LOCTEXT("AssetTypeActions_FooBar", "Foo Bar");
+  }
+
+  TSoftClassPtr<UObject> UAssetDefinition_FooBar::GetAssetClass() const
+  {
+      return UFooBar::StaticClass();
+  }
+
+  FLinearColor UAssetDefinition_FooBar::GetAssetColor() const
+  {
+      return FLinearColor(FColor(201, 29, 85));
+  }
+
+  FText UAssetDefinition_FooBar::GetAssetDescription(const FAssetData& AssetData) const
+  {
+      return LOCTEXT("AssetTypeActions_FooBarDesc", "A collection of FooBar.");
+  }
+
+  TConstArrayView<FAssetCategoryPath> UAssetDefinition_FooBar::GetAssetCategories() const
+  {
+      static const auto Categories = { EAssetCategoryPaths::Gameplay };
+      return Categories;
+  }
+
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+****** (Additional) For DataAsset supporting diff and merge
+
+#+begin_src cpp
+  EAssetCommandResult PerformAssetDiff(const FAssetDiffArgs& DiffArgs) const override final;
+
+  bool CanMerge() const override final;
+  EAssetCommandResult Merge(const FAssetAutomaticMergeArgs& MergeArgs) const override final;
+  EAssetCommandResult Merge(const FAssetManualMergeArgs& MergeArgs) const override final;
+#+end_src
+
+#+begin_src cpp
+  #include "SDetailsDiff.h"// in module Kismet
+  #include "MergeUtils.h"
+
+  EAssetCommandResult UAssetDefinition_DataAsset::PerformAssetDiff(const FAssetDiffArgs& DiffArgs) const
+  {
+      if (DiffArgs.OldAsset == nullptr && DiffArgs.NewAsset == nullptr)
+      {
+          return EAssetCommandResult::Unhandled;
+      }
+
+      const TSharedRef<SDetailsDiff> DetailsDiff = SDetailsDiff::CreateDiffWindow(DiffArgs.OldAsset, DiffArgs.NewAsset, DiffArgs.OldRevision, DiffArgs.NewRevision, UDataAsset::StaticClass());
+      // allow users to edit NewAsset if it's a local asset
+      if (!FPackageName::IsTempPackage(DiffArgs.NewAsset->GetPackage()->GetName()))
+      {
+          DetailsDiff->SetOutputObject(DiffArgs.NewAsset);
+      }
+      return EAssetCommandResult::Handled;
+  }
+
+  bool UAssetDefinition_DataAsset::CanMerge() const
+  {
+      return true;
+  }
+
+  EAssetCommandResult UAssetDefinition_DataAsset::Merge(const FAssetAutomaticMergeArgs& MergeArgs) const
+  {
+      return MergeUtils::Merge(MergeArgs);
+  }
+
+  EAssetCommandResult UAssetDefinition_DataAsset::Merge(const FAssetManualMergeArgs& MergeArgs) const
+  {
+      return MergeUtils::Merge(MergeArgs);
+  }
+#+end_src
+
+***** Another nested arrangement
+
+****** =Private/FooBarAssetDefinitions.h=
+
+#+begin_src cpp
+  #pragma once
+
+  #include "AssetDefinitionDefault.h"
+  #include "Path/to/FooBarAssetOne.h"
+  #include "Path/to/FooBarAssetTwo.h"
+
+  namespace UE::FooBar
+  {
+      FLinearColor GetAssetColor();
+      TConstArrayView<FAssetCategoryPath> GetAssetCategories();
+      UThumbnailInfo* LoadThumbnailInfo(const FAssetData& InAssetData);
+  } // namespace UE::FooBar
+
+  #define LOCTEXT_NAMESPACE "FooBarAssetDefinition"
+
+  UCLASS()
+  class UAssetDefinition_FooBarAssetOne : public UAssetDefinitionDefault
+  {
+      GENERATED_BODY()
+
+  public:
+      virtual FLinearColor GetAssetColor() const override { return UE::FooBar::GetAssetColor(); }
+      virtual TConstArrayView<FAssetCategoryPath> GetAssetCategories() const override { return UE::FooBar::GetAssetCategories(); }
+      virtual UThumbnailInfo* LoadThumbnailInfo(const FAssetData& InAssetData) const override { return UE::FooBar::LoadThumbnailInfo(InAssetData); }
+
+      virtual FText GetAssetDisplayName() const override { return LOCTEXT("DisplayName_UFooBarAssetOne", "Foo Bar Asset One"); }
+      virtual TSoftClassPtr<UObject> GetAssetClass() const override { return UFooBarAssetOne::StaticClass(); }
+  };
+
+  UCLASS()
+  class UAssetDefinition_FooBarAssetTwo : public UAssetDefinitionDefault
+  {
+      GENERATED_BODY()
+
+  public:
+      virtual FLinearColor GetAssetColor() const override { return UE::FooBar::GetAssetColor(); }
+      virtual TConstArrayView<FAssetCategoryPath> GetAssetCategories() const override { return UE::FooBar::GetAssetCategories(); }
+      virtual UThumbnailInfo* LoadThumbnailInfo(const FAssetData& InAssetData) const override { return UE::FooBar::LoadThumbnailInfo(InAssetData); }
+
+      virtual FText GetAssetDisplayName() const override { return LOCTEXT("DisplayName_UFooBarAssetTwo", "Foo Bar Asset Two"); }
+      virtual TSoftClassPtr<UObject> GetAssetClass() const override { return UFooBarAssetTwo::StaticClass(); }
+  };
+
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+****** =Private/FooBarAssetDefinitions.cpp=
+
+#+begin_src cpp
+  #include "FooBarAssetDefinitions.h"
+  #include "ThumbnailRendering/SceneThumbnailInfo.h"
+
+  namespace UE::FooBar
+  {
+
+  FLinearColor GetAssetColor()
+  {
+      static const FLinearColor AssetColor(FColor(29, 96, 125));
+      return AssetColor;
+  }
+
+  TConstArrayView<FAssetCategoryPath> GetAssetCategories()
+  {
+      static const auto Categories = { FAssetCategoryPath(EAssetCategoryPaths::Animation, NSLOCTEXT("FooBarAssetDefinition", "FooBarAssetDefinitionMenu", "FooBar")) };
+      return Categories;
+  }
+
+  UThumbnailInfo* LoadThumbnailInfo(const FAssetData & InAssetData)
+  {
+      return UE::Editor::FindOrCreateThumbnailInfo(InAssetData.GetAsset(), USceneThumbnailInfo::StaticClass());
+  }
+
+  } // namespace UE::FooBar
+#+end_src
+
+***** Use custom assets category
+
+****** Simple way
+
+in =AssetDefinition_FooBar::GetAssetCategories=
+
+#+begin_src cpp
+  #define LOCTEXT_NAMESPACE "AssetDefinition_FooBar"
+
+  TConstArrayView<FAssetCategoryPath> UAssetDefinition_FooBar::GetAssetCategories() const
+  {
+      static const auto Categories = { FAssetCategoryPath(LOCTEXT("FooBarAssetsCategoryName", "FooBar")) };
+      return Categories;
+  }
+
+  #undef LOCTEXT_NAMESPACE
+#+end_src
+
+if you want a sub menu:
+
+#+begin_src cpp
+  {
+      //static const auto Categories = { FAssetCategoryPath(EAssetCategoryPaths::Gameplay, LOCTEXT("FooBar_SubCategory", "FooBarSub")) };
+      static const auto Categories = { EAssetCategoryPaths::Gameplay / LOCTEXT("FooBarAssetsCategoryName", "FooBar") };
+      return Categories;
+  }
+#+end_src
+
+****** AssetTool way
+
+#+begin_src cpp
+  #include "AssetToolsModule.h"
+
+  // Usually StartModule
+  {
+      IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+      FooBarAssetsCategory = AssetTools.RegisterAdvancedAssetCategory(TEXT("FooBar"), LOCTEXT("FooBarAssetsCategoryName", "FooBar"));
+  }
+#+end_src
+
+**** AssetTypeActions (Deprecated)
+
+***** build.cs
+
+#+begin_src csharp
+            PrivateDependencyModuleNames.AddRange(
+                new string[] {
+                    "Core",
+                    "CoreUObject",
                     "UnrealEd",
                     "AssetTools",// for addition AssetTypeActions
                 }
             );
 #+end_src
 
-**** Add Factory of the UObject (module header)
+***** Add Factory of the UObject in =Private= folder (could be inside YourModule.h)
 
 #+begin_src cpp
   #pragma once
 
-  #include "CoreMinimal.h"
   #include "Factories/Factory.h"
   #include "MyModuleEditorModule.generated.h"
 
@@ -5853,7 +6273,7 @@ class MYMODULE_API UMyItemsDatabase : public UDataAsset
       GENERATED_UCLASS_BODY()
 
   public:
-      virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+      virtual UObject* FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 
   protected:
       virtual bool IsMacroFactory() const { return false; }
@@ -5865,14 +6285,14 @@ class MYMODULE_API UMyItemsDatabase : public UDataAsset
       GENERATED_UCLASS_BODY()
 
   public:
-      virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+      virtual UObject* FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 
   protected:
       virtual bool IsMacroFactory() const { return false; }
   };
 #+end_src
 
-**** module cpp
+***** YourModule.cpp
 
 #+begin_src cpp
   #include "MyModuleEditorModule.h"
@@ -5895,16 +6315,16 @@ class MYMODULE_API UMyItemsDatabase : public UDataAsset
       bCreateNew = true;
   }
 
-  UObject* UMyItemsDatabase_Factory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+  UObject* UMyItemsDatabase_Factory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
   {
-      check(Class->IsChildOf(UMyItemsDatabase::StaticClass()));
-      return NewObject<UMyItemsDatabase>(InParent, Class, Name, Flags | RF_Transactional, Context);
+      check(InClass->IsChildOf(UMyItemsDatabase::StaticClass()));
+      return NewObject<UMyItemsDatabase>(InParent, InClass, InName, Flags | RF_Transactional, Context);
   }
 #+end_src
 
 Now we can create the object from editor menu (in Miscellaneous category), but not support filter yet.
 
-**** Create new AssetTypeActions (in module cpp or other file)
+***** Create new AssetTypeActions in =Private= folder (in module cpp or other file)
 
 #+begin_src cpp
   class FMyModuleEditorModule : public IModuleInterface
@@ -5967,7 +6387,7 @@ Now we can create the object from editor menu (in Miscellaneous category), but n
   #undef LOCTEXT_NAMESPACE
 #+end_src
 
-**** Register in =StartupModule()=
+***** Register in =StartupModule()=
 
 #+begin_src cpp
   void FMyModuleEditorModule::StartupModule()
@@ -5983,7 +6403,7 @@ Now we can create the object from editor menu (in Miscellaneous category), but n
   }
 #+end_src
 
-**** Unregister in =ShutdownModule()=
+***** Unregister in =ShutdownModule()=
 
 #+begin_src cpp
   void FMyModuleEditorModule::StartupModule()
