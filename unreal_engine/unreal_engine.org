@@ -1688,7 +1688,82 @@ instanced per player
 
 =FEnhancedActionKeyMapping=
 
-** Support for =DUALSHOCK®4= on Windows via RawInput plugin
+** GameInput for Windows Plugin
+
+[[https://dev.epicgames.com/community/learning/tutorials/EpZ4/unreal-engine-game-input-for-windows-experimental-release-notes][Game Input for Windows - Experimental Release Notes]]
+
+installs the GameInput libraries from October 2023 GDK Update 5 Public Release or NuGet to your solution
+
+#+begin_src conf
+[/Script/GameInputBase.GameInputDeveloperSettings]
+#+end_src
+
+*** DUALSHOCK®3 wireless controller (SCPH-98050/CECHZC2)
+
+> from 0lento
+> Seems to lose analog triggers on windows but I remember it being like that on directinput too.
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=616),Description="DUALSHOCK 3 wireless controller (SCPH-98050/CECHZC2)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="SCPH-98050/CECHZC2",bProcessControllerButtons=True,bProcessControllerSwitchState=False,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_Special_Left"),(2, "Gamepad_LeftThumbstick"),(4, "Gamepad_RightThumbstick"),(8, "Gamepad_Special_Right"),(16, "Gamepad_DPad_Up"),(32, "Gamepad_DPad_Right"),(64, "Gamepad_DPad_Down"),(128, "Gamepad_DPad_Left"),(256, "Gamepad_LeftTrigger"),(512, "Gamepad_RightTrigger"),(1024, "Gamepad_LeftShoulder"),(2048, "Gamepad_RightShoulder"),(4096, "Gamepad_FaceButton_Top"),(8192, "Gamepad_FaceButton_Right"),(16384, "Gamepad_FaceButton_Bottom"),(32768, "Gamepad_FaceButton_Left"),(65536, "Gamepad_Special_Left_X")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+*** DUALSHOCK®4 wireless controller (CUH-ZCT1)
+
+> The PS4 DualShock4 controller is actually considered a “Gamepad” type by the low level Game Input API. Because of this, it will actually “just work” if you enable “bProcessGamepad” in your project settings. However, if you want to use the Game Input plugin in conjunction with XInput to get the maximum device support, we would recommend still treating it as a generic “controller” within GameInput.
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=1476),Description="DUALSHOCK 4 wireless controller (CUH-ZCT1)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="CUH-ZCT1",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Left"),(2, "Gamepad_FaceButton_Bottom"),(4, "Gamepad_FaceButton_Right"),(8, "Gamepad_FaceButton_Top"),(16, "Gamepad_LeftShoulder"),(32, "Gamepad_RightShoulder"),(64, "Gamepad_LeftTrigger"),(128, "Gamepad_RightTrigger"),(256, "Gamepad_Special_Left"),(512, "Gamepad_Special_Right"),(1024, "Gamepad_LeftThumbstick"),(2048, "Gamepad_RightThumbstick"),(8192, "Gamepad_Special_Left")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",DeadZone=0.239532,bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_LeftTriggerAxis")),(4, (KeyName="Gamepad_RightTriggerAxis",DeadZone=0.239532)),(5, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+> from 0lento
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=1476),Description="DUALSHOCK 4 wireless controller (CUH-ZCT1)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="CUH-ZCT1",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Left"),(2, "Gamepad_FaceButton_Bottom"),(4, "Gamepad_FaceButton_Right"),(8, "Gamepad_FaceButton_Top"),(16, "Gamepad_LeftShoulder"),(32, "Gamepad_RightShoulder"),(64, "Gamepad_LeftTrigger"),(128, "Gamepad_RightTrigger"),(256, "Gamepad_Special_Left"),(512, "Gamepad_Special_Right"),(1024, "Gamepad_LeftThumbstick"),(2048, "Gamepad_RightThumbstick"),(4096, "Gamepad_Special_Left_Y"),(8192, "Gamepad_Special_Left_X")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_LeftTriggerAxis")),(4, (KeyName="Gamepad_RightTriggerAxis")),(5, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+*** DUALSHOCK®4 wireless controller (CUH-ZCT2)
+
+> from 0lento
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=2508),Description="DUALSHOCK 4 wireless controller (CUH-ZCT2)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="CUH-ZCT2",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Left"),(2, "Gamepad_FaceButton_Bottom"),(4, "Gamepad_FaceButton_Right"),(8, "Gamepad_FaceButton_Top"),(16, "Gamepad_LeftShoulder"),(32, "Gamepad_RightShoulder"),(64, "Gamepad_LeftTrigger"),(128, "Gamepad_RightTrigger"),(256, "Gamepad_Special_Left"),(512, "Gamepad_Special_Right"),(1024, "Gamepad_LeftThumbstick"),(2048, "Gamepad_RightThumbstick"),(4096, "Gamepad_Special_Left_Y"),(8192, "Gamepad_Special_Left_X")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_LeftTriggerAxis")),(4, (KeyName="Gamepad_RightTriggerAxis")),(5, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+*** DualSense wireless controller (CFI-ZCT1W)
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=3302),Description="DualSense wireless controller (CFI-ZCT1W)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="CFI-ZCT1W",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Left"),(2, "Gamepad_FaceButton_Bottom"),(4, "Gamepad_FaceButton_Right"),(8, "Gamepad_FaceButton_Top"),(16, "Gamepad_LeftShoulder"),(32, "Gamepad_RightShoulder"),(64, "Gamepad_LeftTrigger"),(128, "Gamepad_RightTrigger"),(256, "Gamepad_Special_Left"),(512, "Gamepad_Special_Right"),(1024, "Gamepad_LeftThumbstick"),(2048, "Gamepad_RightThumbstick"),(8192, "Gamepad_Special_Left")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",DeadZone=0.239532,bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_LeftTriggerAxis")),(4, (KeyName="Gamepad_RightTriggerAxis",DeadZone=0.239532)),(5, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))))
+#+end_src
+
+> from 0lento
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=3302),Description="DualSense wireless controller (CFI-ZCT1W)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="CFI-ZCT1W",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Left"),(2, "Gamepad_FaceButton_Bottom"),(4, "Gamepad_FaceButton_Right"),(8, "Gamepad_FaceButton_Top"),(16, "Gamepad_LeftShoulder"),(32, "Gamepad_RightShoulder"),(64, "Gamepad_LeftTrigger"),(128, "Gamepad_RightTrigger"),(256, "Gamepad_Special_Left"),(512, "Gamepad_Special_Right"),(1024, "Gamepad_LeftThumbstick"),(2048, "Gamepad_RightThumbstick"),(4096, "Gamepad_Special_Left_Y"),(8192, "Gamepad_Special_Left_X"),(16384, "Gamepad_Special_Left_Y")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_LeftTriggerAxis")),(4, (KeyName="Gamepad_RightTriggerAxis")),(5, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+*** DualSense Edge™ wireless controller (CFI-ZCP1)
+
+> from 0lento
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1356,ProductId=3570),Description="DualSense Edge wireless controller (CFI-ZCP1)",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="CFI-ZCP1",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=True,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Left"),(2, "Gamepad_FaceButton_Bottom"),(4, "Gamepad_FaceButton_Right"),(8, "Gamepad_FaceButton_Top"),(16, "Gamepad_LeftShoulder"),(32, "Gamepad_RightShoulder"),(64, "Gamepad_LeftTrigger"),(128, "Gamepad_RightTrigger"),(256, "Gamepad_Special_Left"),(512, "Gamepad_Special_Right"),(1024, "Gamepad_LeftThumbstick"),(2048, "Gamepad_RightThumbstick"),(4096, "Gamepad_Special_Left_Y"),(8192, "Gamepad_Special_Left_X")),ControllerAxisMappingData=((0, (KeyName="Gamepad_LeftX",bIsPackedPositveAndNegative=True)),(1, (KeyName="Gamepad_LeftY",Scalar=-1.000000,bIsPackedPositveAndNegative=True)),(2, (KeyName="Gamepad_RightX",bIsPackedPositveAndNegative=True)),(3, (KeyName="Gamepad_LeftTriggerAxis")),(4, (KeyName="Gamepad_RightTriggerAxis")),(5, (KeyName="Gamepad_RightY",Scalar=-1.000000,bIsPackedPositveAndNegative=True))),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+*** Xbox One Rock Band 4 Jaguar Guitar
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=3695,ProductId=368),Description="The Xbox One rockband jag guitar",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="RockbandJagGuitar",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=False,ControllerButtonMappingData=((1, "Gamepad_Special_Right"),(2, "Gamepad_Special_Left"),(4, "Gamepad_FaceButton_Bottom"),(8, "Gamepad_FaceButton_Right"),(16, "Gamepad_FaceButton_Left"),(32, "Gamepad_FaceButton_Top"),(64, "Gamepad_DPad_Up"),(128, "Gamepad_DPad_Down"),(256, "Gamepad_DPad_Left"),(512, "Gamepad_DPad_Right"),(1024, "Gamepad_LeftShoulder")),ControllerAxisMappingData=(),bProcessRawReportData=True,RawReportReadingId=32,RawReportMappingData=((2, (KeyName="TIlt")),(3, (KeyName="Gamepad_LeftTriggerAxis")),(6, (KeyName="Gamepad_LeftStick_Down",TranslationBehavior=TreatAsButton,ButtonBitMaskMappings=((1, "Gamepad_LeftStick_Down"),(2, "Gamepad_LeftStick_Down"),(3, "Gamepad_LeftStick_Down"),(4, "Gamepad_LeftStick_Down"),(0, "Gamepad_LeftStick_Down"))))))
+#+end_src
+
+*** Logitech G920 Racing Wheel
+
+Enable the “Process Racing Wheel” option in your project settings for your desired platform. Then add this device configuration to your INI file:
+
+#+begin_src conf
++DeviceConfigurations=(DeviceIdentifier=(VendorId=1133,ProductId=49762),Description="Logitech G920 Racing Wheel",bOverrideHardwareDeviceIdString=True,OverriddenHardwareDeviceId="RacingWheel",bProcessControllerButtons=True,bProcessControllerSwitchState=True,bProcessControllerAxis=False,ControllerButtonMappingData=((1, "Gamepad_FaceButton_Bottom"),(2, "Gamepad_FaceButton_Right"),(4, "Gamepad_FaceButton_Left"),(8, "Gamepad_FaceButton_Top"),(64, "Gamepad_Special_Right"),(128, "Gamepad_Special_Left"),(256, "Gamepad_RightShoulder"),(512, "Gamepad_LeftShoulder")),ControllerAxisMappingData=(),bProcessRawReportData=False,RawReportReadingId=0,RawReportMappingData=())
+#+end_src
+
+** (Deprecated, use GameInput plugin) Support for =DUALSHOCK®4= on Windows via RawInput plugin
 
 + Enable "Windows RawInput" plugin
 
@@ -2704,6 +2779,12 @@ and implement the function like this (this is a hard override of the default Gam
   #pragma endregion TagRelationship //}
 #+end_src
 
+** Ability Fail Tag
+
+AbilitySystemGlobal
+
+DefaultGame.ini
+
 * Gameplay Interaction (Plugin)
 
 * *Modular Gameplay*
@@ -2936,6 +3017,78 @@ This can then be used to call functions like =CheckDefaultInitialization= that m
 
 ****** In character, check if data replicated in every critical phase like =OnRep_PlayerState=, etc.
 
+****** Register tag order for init state GameplayTags in =GameInstance::Init()=
+
+#+begin_src cpp
+  #include "Components/GameFrameworkComponentManager.h"
+
+  void ULyraGameInstance::Init()
+  {
+      Super::Init();
+
+      // Register our custom init states
+      UGameFrameworkComponentManager* ComponentManager = GetSubsystem<UGameFrameworkComponentManager>(this);
+
+      if (ensure(ComponentManager))
+      {
+          ComponentManager->RegisterInitState(LyraGameplayTags::InitState_Spawned, false, FGameplayTag());
+          ComponentManager->RegisterInitState(LyraGameplayTags::InitState_DataAvailable, false, LyraGameplayTags::InitState_Spawned);
+          ComponentManager->RegisterInitState(LyraGameplayTags::InitState_DataInitialized, false, LyraGameplayTags::InitState_DataAvailable);
+          ComponentManager->RegisterInitState(LyraGameplayTags::InitState_GameplayReady, false, LyraGameplayTags::InitState_DataInitialized);
+      }
+  }
+#+end_src
+
+**** Use ActorExtensionEvent in actor (Extension system) (not recommended, use GameFeature instead)
+
+Send event to actor with a FName.
+
+- FComponentRequestHandle :: A handle for a request to put components or call a delegate for an extensible actor class. When this handle is destroyed, it will remove the associated request from the system.
+
+***** Sender
+
+#+begin_src cpp
+  public:
+      // The name of the extension event sent via UGameFrameworkComponentManager when FooBarReady.
+      static const FName NAME_FooBar;
+#+end_src
+
+#+begin_src cpp
+  const FName UAvatarComponent::NAME_FooBar("FooBarReady");
+
+  UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(AReceiverActor, NAME_FooBar);
+#+end_src
+
+***** Receiver
+
+#+begin_src cpp
+  if (UGameFrameworkComponentManager* ComponentMan = UGameInstance::GetSubsystem<UGameFrameworkComponentManager>(GameInstance))
+  {
+      auto FooBarDelegate = UGameFrameworkComponentManager::FExtensionHandlerDelegate::CreateUObject(
+                        this, &ThisClass::HandleActorExtension);
+      TSharedPtr<FComponentRequestHandle> ExtensionRequestHandle = ComponentMan->AddExtensionHandler(this, FooBarDelegate);
+      // Save the ExtensionRequestHandle somewhere, or delegate will be removed when the handle out of scope.
+  }
+#+end_src
+
+#+begin_src cpp
+  void AFooBarActor::HandleActorExtension(AActor* Actor, FName EventName)
+  {
+      if (EventName == ...)
+      {
+          // do something
+      }
+      else if (EventName == ...)
+      {
+          // do something
+      }
+  }
+#+end_src
+
+**** AddComponent Request
+
+request to instantiate components on actors of the given classes.
+
 ** Game Features
 
 *** Setup
@@ -3010,6 +3163,12 @@ Load *All* GameFeatures
 ***** UGameFeaturesSubsystemSettings
 
 *** Feature State
+
+*** GameFeature snippet
+
+**** FindOrAddComponentForActor
+
+**** HandleActorExtensionEvent
 
 * Mass (ECS)
 
@@ -5131,6 +5290,8 @@ TODO
 
 *** with GAS
 
+*** AssetBundles
+
 ** Asset Manager
 
 Async data loading management
@@ -6930,12 +7091,6 @@ e.g. GameMode.h
     git lfs install
   #+end_src
 
-** *Pitfall*
-
-*** Asset Conditional Pipeline
-
-Mesh imported to UE will be *Triangulate*
-
 ** Blueprint
 
 *** debug
@@ -7143,6 +7298,78 @@ The solution is add a =.Get()= to TObjectPtr.
 - Disable =Shadowmaps= and =DBuffer decals= on pure real-time illumination games.
 
 ** Advanced Renamer Plugin
+
+** IsValid checks the UObject's flags for validity in addition to nullptr
+
+a UObject can be non-null but still in an invalid state.
+
+Always use =IsValid= when checking UObject validity.
+
+it has nothing to do with the container you store the ptr in, raw, TOP, weak, soft, etc.
+
+it has to do with the UObject itself having flags such as being marked pending kill where it should be dead but the GC hasn't released the memory yet, so you can get UB.
+
+#+begin_src
+if (Object) // bad
+if (IsValid(Object)) // good
+
+UObject* object = GetValid(FooBar); // if you need if-init use GetValid (return the object ptr when valid)
+#+end_src
+
+> though weak will return null for pending kill objects by default.
+
+* Traps and Pitfalls
+
+** Asset Conditional Pipeline
+
+Mesh imported to UE will be *Triangulate*
+
+** binding a delegate (especially dynamic) in constructor or getting loaded from serialized data
+
+ctor delegate binding are problematic
+
+ctor is for construction things, setting default values and subobjects, not for initialization, binding, etc.
+
+best to do it in BeginPlay
+
+If you made any blueprints based on this C++ class, you may need to recreate them if you bound delegates in the constructor, otherwise the delegates can be saved into the BP itself and the problems will persist.
+
+doing delegate binds/adddynamic in constructor is a trap, need to guard CDO as dynamic delegate will be serialized into asset and load wrong pointer afterwards on instances
+
+It might be a bit less of an issue with non-dynamic delegates since I don't think they get serialized like dynamic delegates do, but there are some other things that happen like constructors being ran for CDOs and things that live only in editor so you'd probably want to avoid binding them there in any case.
+
+Constructors are usually a bad place because then your CDO will be binding to them, your CDO shouldn't be responding to events in 99.999% of cases.
+
+** Make Blueprint subclass Data asset to only store data (without any logic)
+
+The BP subclassed DAs (blue) instead of DA instances (red), blue DAs won't even be discovered by the AssetManager by default
+
+if they're primary data asset they will have proper label
+
+AM type entry must have Has Blueprint Classes checked, even if it implements label
+
+** Pointers to uobjects should be UPROPERTY
+
+Pointers to uobjects should be UPROPERTY by default unless you have a reason for them not to be. UPROPERTY raw/TObjectPtr is a strong reference that will keep the object alive when the GC runs.
+
+If you don't want to contribute to forcing it to be alive, TWeakObjectPtr<T>
+This is useful if you want to hold a ref for the purpose of observing but not managing the lifetime.
+
+If you don't need reflection to know about them or you want to make a weak tobjectptr/raw ptr
+Reflection needs to know about them if you want serialization, BP, etc
+Otherwise they live only in C++ land
+
+** TMap
+
+*** Use pointer as key
+
+ptr as key can have UB because potentially multiple nullptr keys,
+
+Probably want to use FObjectKey/TObjectKey.
+
+** Lyra
+
+- one of the more heinous things lyra does is storing Editor time constants in a DA they sync load instead of a UDeveloperSettings
 
 * Style Guide
 
